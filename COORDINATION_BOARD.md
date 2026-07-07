@@ -15,9 +15,9 @@
 - **חסימות**: אין.
 
 ### 🟡 Cursor (Mobile App Shell & UI)
-- **משימה נוכחית**: ✅ הושלם App Shell — Expo SDK 53 + NativeWind + Expo Router + i18n + Supabase client + Types.
-- **הצעד הבא**: בניית מסכי Onboarding ורישום (הורה ומשלבת) לפי עיצובי Stitch.
-- **חסימות**: אין. ממתין לייצוא קוד/HTML של מסכי Stitch (אופציונלי — אפשר לבנות מה-Screenshots).
+- **משימה נוכחית**: ✅ מסכי הורה — פרופיל ילד, בית (התאמות), בקשות, שליחת בקשה למשלבת.
+- **הצעד הבא**: מסכי בית משלבת (בקשות + Browse TIER 0).
+- **חסימות**: אין.
 
 ---
 
@@ -29,7 +29,7 @@
 - [x] כתיבת פונקציות מנוע התאמה ו-check-in (`003_functions.sql`)
 - [x] יצירת נתוני Seed לבדיקות (`seed.sql`)
 - [x] הרצת מיגרציות ו-Seed בפרויקט Supabase בענן (`flrflktlltmqbiamljlm`)
-- [ ] כתיבת בדיקות RLS אוטומטיות
+- [x] כתיבת בדיקות RLS אוטומטיות
 
 ### 🎨 עיצוב וחווית משתמש (אחריות: Antigravity)
 - [x] יצירת Design System ב-Stitch
@@ -41,8 +41,10 @@
 - [x] הגדרת Expo Router (כולל role-based routing ל-parent ו-professional)
 - [x] הגדרת i18n (עברית ואנגלית עם תמיכת RTL)
 - [x] חיבור Supabase JS Client והפקת Types (`@toghther/shared`)
-- [ ] מסכי Onboarding ורישום (הורה / משלבת)
-- [ ] מסכי בית הורה (התאמות)
+- [x] מסכי Onboarding ורישום (הורה / משלבת) + Auth OTP
+- [x] פרופיל ילד (CRUD) + בורר ילדים
+- [x] מסכי בית הורה (התאמות מ-RPC `get_matches_for_child`)
+- [x] זרימת שליחת בקשה (TIER 1) + מסך בקשות
 - [ ] מסכי בית משלבת (בקשות ו-Browse)
 
 ---
