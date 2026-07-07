@@ -15,8 +15,8 @@
 - **חסימות**: אין.
 
 ### 🟡 Cursor (Mobile App Shell & UI)
-- **משימה נוכחית**: ✅ מסכי משלבת — בית (בקשות נכנסות + תגובה), Browse TIER 0, פרופיל (עריכה).
-- **הצעד הבא**: זרימת התאמה פעילה (check-in, יומן יומי) / חיבור Edge Function `calculate-matches`.
+- **משימה נוכחית**: ✅ מסכי התאמה פעילה — לוח בקרה (GPS check-in + AI insights + logs) ו-form יומן פדגוגי (mood + metrics + notes). צרכני `useCheckin`/`useDailyLogs`.
+- **הצעד הבא**: חיבור מסך התאמה לפי `matchId` מהורה/משלבת (רשומת match פעיל).
 - **חסימות**: אין.
 
 ---
@@ -50,6 +50,8 @@
 - [x] מסכי בית משלבת: בקשות נכנסות + תגובה (interested/rejected)
 - [x] Browse TIER 0 (ילדים מפורסמים) + הבעת עניין
 - [x] פרופיל משלבת (עריכת התמחויות, מסגרות, ניסיון, bio)
+- [x] Active match dashboard (EVV check-in card, AI insights, logs list)
+- [x] Daily log form (mood + pedagogical metrics + notes)
 
 ---
 
