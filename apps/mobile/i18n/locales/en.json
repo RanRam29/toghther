@@ -146,6 +146,12 @@
       "rejected": "Rejected",
       "expired": "Expired",
       "withdrawn": "Withdrawn"
+    },
+    "verification": {
+      "pending": "Pending verification",
+      "submitted": "Under review",
+      "verified": "Verified",
+      "rejected": "Rejected"
     }
   },
   "professional": {
@@ -154,7 +160,19 @@
     "profile": "My profile",
     "browse": "Browse",
     "browseSubtitle": "Available child cards in your area",
-    "noRequests": "No new requests right now"
+    "noRequests": "No new requests right now",
+    "hiddenChild": "Child",
+    "verbal": "Verbal communication",
+    "nonVerbal": "Non-verbal communication",
+    "accept": "Interested",
+    "reject": "Decline",
+    "interestSent": "Interest sent to the parent",
+    "notVerified": "Only verified professionals can browse child cards",
+    "noChildren": "No available child cards in your area right now",
+    "expressInterest": "Express interest",
+    "profileSaved": "Profile saved successfully",
+    "saveProfile": "Save profile",
+    "verificationStatus": "Verification status"
   },
   "activeMatch": {
     "title": "Active match",

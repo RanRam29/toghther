@@ -146,6 +146,12 @@
       "rejected": "נדחה",
       "expired": "פג תוקף",
       "withdrawn": "בוטל"
+    },
+    "verification": {
+      "pending": "ממתין לאימות",
+      "submitted": "בבדיקה",
+      "verified": "מאומתת",
+      "rejected": "נדחתה"
     }
   },
   "professional": {
@@ -154,7 +160,19 @@
     "profile": "הפרופיל שלי",
     "browse": "עיון",
     "browseSubtitle": "כרטיסי ילדים זמינים באזור שלך",
-    "noRequests": "אין בקשות חדשות כרגע"
+    "noRequests": "אין בקשות חדשות כרגע",
+    "hiddenChild": "ילד/ה",
+    "verbal": "תקשורת מילולית",
+    "nonVerbal": "תקשורת לא-מילולית",
+    "accept": "מעוניינת",
+    "reject": "דחייה",
+    "interestSent": "העניין נשלח להורה",
+    "notVerified": "רק משלבות מאומתות יכולות לעיין בכרטיסי ילדים",
+    "noChildren": "אין כרגע כרטיסי ילדים זמינים באזור",
+    "expressInterest": "הבעת עניין",
+    "profileSaved": "הפרופיל נשמר בהצלחה",
+    "saveProfile": "שמירת פרופיל",
+    "verificationStatus": "סטטוס אימות"
   },
   "activeMatch": {
     "title": "עבודה שוטפת",
