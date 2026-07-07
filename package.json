@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "cd apps/mobile && npx expo start",
     "lint": "cd apps/mobile && npx expo lint",
+    "test:matching": "npx jest --config packages/matching/jest.config.js",
     "types:generate": "npx supabase gen types typescript --linked > packages/shared/src/types/database.ts"
   },
   "engines": {
