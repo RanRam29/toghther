@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -669,6 +669,20 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      children_tier0: {
+        Row: {
+          age: number
+          area_general: string | null
+          category: Database["public"]["Enums"]["need_category"]
+          created_at: string
+          framework: Database["public"]["Enums"]["framework_type"]
+          hours_needed: Json | null
+          id: string
+          first_name: string
+          secondary_category: Database["public"]["Enums"]["need_category"] | null
         }
         Relationships: []
       }
@@ -1612,6 +1626,50 @@ export type Database = {
           checkin_id: string
           distance_m: number
           is_valid: boolean
+        }[]
+      }
+      approve_request: {
+        Args: {
+          p_request_id: string
+        }
+        Returns: string
+      }
+      reject_request: {
+        Args: {
+          p_request_id: string
+        }
+        Returns: undefined
+      }
+      withdraw_request: {
+        Args: {
+          p_request_id: string
+        }
+        Returns: undefined
+      }
+      respond_to_request: {
+        Args: {
+          p_request_id: string
+          p_status: string
+        }
+        Returns: undefined
+      }
+      get_child_details: {
+        Args: {
+          p_child_id: string
+        }
+        Returns: {
+          child_id: string
+          created_at: string
+          diagnosis_full: string | null
+          full_name: string | null
+          gender_preference: string | null
+          id: string
+          notes: string | null
+          parent_contact: Json | null
+          updated_at: string
+          what_triggers: string | null
+          what_works: string | null
+          win_definition: string | null
         }[]
       }
     }
