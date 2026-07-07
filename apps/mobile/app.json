@@ -8,9 +8,19 @@
     "scheme": "together",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.toghther.app"
+      "bundleIdentifier": "com.toghther.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": ["he", "en"],
+        "CFBundleDevelopmentRegion": "he",
+        "NSPhotoLibraryUsageDescription": "יש צורך בהרשאה לגלריה כדי לצרף מסמכי אימות",
+        "NSCameraUsageDescription": "יש צורך בהרשאה למצלמה כדי לצלם מסמכי אימות",
+        "NSLocationWhenInUseUsageDescription": "יש צורך במיקום כדי לבצע צ'ק-אין GPS בתחילת המשמרת (EVV)"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +29,15 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.toghther.app"
+      "package": "com.toghther.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -37,10 +55,22 @@
           "cameraPermission": "יש צורך בהרשאה למצלמה כדי לצלם מסמכי אימות"
         }
       ],
-      "expo-document-picker"
+      "expo-document-picker",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "יש צורך במיקום כדי לבצע צ'ק-אין GPS בתחילת המשמרת (EVV)"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID_AFTER_INIT"
+      }
+    },
+    "owner": "REPLACE_WITH_EAS_OWNER_SLUG"
   }
 }
