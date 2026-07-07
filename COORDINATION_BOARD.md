@@ -1,5 +1,16 @@
 # 🚦 Together — לוח תיאום וסטטוס סוכנים
 
+> **⚠️ עדכון ארכיטקט (2026-07-07): תיעוד מלא נוסף — נקודת הכניסה לכל משימה היא `product/00-INDEX.md`.**
+> - **`product/`** — תיק המוצר: החלטות סופיות (01), פרסונות (02), מסעות (03–04), **מפרט מסכים (05)**, קופי (06), מדדים (07), analytics ‏(08), **DoD ‏(09) — חובה לפני סימון משימה כגמורה**, אזור מנהל (10).
+> - **`docs/`** — ‏ARCHITECTURE · DEV-PROCESS (כולל סדר עדיפויות תקף) · TESTING-STRATEGY.
+> - **`docs/SECURITY-GUIDELINES.md` + `docs/AUTH-SPEC.md`** — פיתוח מונחה־אבטחה, אימות והרשאות, מטריצת הרשאות מלאה. **מחייבים לכל משימה שנוגעת בנתונים.**
+> - **`ARCHITECTURE_REVIEW.md`** — תיקוני אבטחה קריטיים שקודמים לכל פיתוח אחר. **חדש 🔴 C4: כל משתמש יכול למנות עצמו אדמין** (‏`profiles_own_update` בלי WITH CHECK על role) — התיקון הראשון בתור. בנוסף C1 (self-approve), C2/C3 (חשיפת children + audit).
+> - **חדש (D23): אזור מנהל מלא ב-MVP** — route group ‏`(admin)` ב-web; תור האימות (Admin-1) משתלב באבן דרך 3. מפרט: `product/10-ADMIN-SPEC.md`.
+> בנושאי אבטחה/ארכיטקטורה — ARCHITECTURE_REVIEW גובר; בנושאי מוצר/UX — תיק המוצר גובר על DEVELOPMENT_PLAN.md.
+>
+> **📮 שאלות לארכיטקט** (סוכן שנתקל בשאלה מוצרית פתוחה — רושם כאן וממשיך במשימה אחרת):
+> - (אין כרגע)
+
 > **הנחיה לסוכנים (Antigravity & Cursor):**
 > 1. **קראו** את הקובץ הזה בתחילת כל סבב עבודה כדי להבין מה הסוכן השני עושה.
 > 2. **עדכנו** את הסטטוס שלכם ואת לוח המשימות בקובץ זה וב-`coordination_state.json` בסוף כל סבב עבודה.
@@ -15,9 +26,16 @@
 - **חסימות**: אין.
 
 ### 🟡 Cursor (Mobile App Shell & UI)
-- **משימה נוכחית**: ✅ מסכי התאמה פעילה — לוח בקרה (GPS check-in + AI insights + logs) ו-form יומן פדגוגי (mood + metrics + notes). צרכני `useCheckin`/`useDailyLogs`.
-- **הצעד הבא**: חיבור מסך התאמה לפי `matchId` מהורה/משלבת (רשומת match פעיל).
-- **חסימות**: אין.
+- **משימה נוכחית**: ✅ סגירת ה-flow המלא end-to-end:
+  - Banner "התאמה פעילה" בבית הורה + משלבת → פותח `(active-match)?matchId=<id>` דרך `useMyActiveMatch`
+  - אישור בקשה בלוח הבקשות → קריאה ל-`approve_request` RPC → יצירת match אטומרית → ניווט ישיר
+  - מסך פרטים עשירים לילד (`child_details`: diagnosis_full, what_works, what_triggers, win_definition, notes)
+  - מסך מסמכי אימות למשלבת (רשימה + סטטוס + מחיקה; העלאה בפועל תיכנס עם `expo-document-picker` כשהרשת תאפשר התקנה)
+  - מסך ביקורות עם StarRating (reliability / professionalism / childFit) המשתמש ב-`useSubmitReview`
+  - Parent home משתמש ב-Edge Function `calculate-matches` (עם Claude enrichment) כברירת מחדל, נופל ל-RPC ישיר בעת כשל
+  - התאמת קריאות ל-RPCs המאובטחים החדשים של אנטיגרביטי (`respond_to_request`, `approve_request`, `children_tier0` view) + cast עד להתחדשות ה-types
+- **הצעד הבא**: הפעלת picker בפועל (`expo-document-picker`/`expo-image-picker`) — דורש רשת יציבה להתקנת חבילות. + אולי גם UI לצפייה בביקורות (`useGetReviewsForProfessional`) בכרטיס משלבת.
+- **חסימות**: אין (רק תלוי-רשת: התקנת חבילות + `types:generate` ל-RPCs החדשים).
 
 ---
 

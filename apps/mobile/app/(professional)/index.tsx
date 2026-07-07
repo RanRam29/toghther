@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -8,7 +9,9 @@ import {
 } from "react-native";
 
 import { IncomingRequestCard } from "@/components/professional/Cards";
+import { ActiveMatchBanner } from "@/components/shared/ActiveMatchBanner";
 import { PlaceholderCard, ScreenShell } from "@/components/ui/Screen";
+import { useActiveMatchForProfessional } from "@/hooks/useActiveMatch";
 import {
   useIncomingRequests,
   useMyProfessional,
@@ -27,11 +30,14 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ProfessionalHomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const userId = session?.user?.id;
 
   const { data: professional } = useMyProfessional(userId);
   const professionalId = professional?.id;
+
+  const { data: activeMatch } = useActiveMatchForProfessional(professionalId);
 
   const {
     data: requests = [],
@@ -67,6 +73,22 @@ export default function ProfessionalHomeScreen() {
         }
         showsVerticalScrollIndicator={false}
       >
+        {activeMatch ? (
+          <ActiveMatchBanner
+            title={t("activeMatch.bannerEyebrow")}
+            subtitle={t("activeMatch.bannerSubtitleChild", {
+              name: activeMatch.child?.first_name ?? "",
+            })}
+            actionLabel={t("activeMatch.bannerAction")}
+            onPress={() =>
+              router.push({
+                pathname: "/(active-match)",
+                params: { matchId: activeMatch.id },
+              })
+            }
+          />
+        ) : null}
+
         {isLoading ? (
           <ActivityIndicator size="large" color="#0F6E56" className="mt-8" />
         ) : requests.length === 0 ? (

@@ -1,13 +1,17 @@
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Alert,
   RefreshControl,
   ScrollView,
   Text,
   View,
 } from "react-native";
 
+import { PrimaryButton } from "@/components/ui/Form";
 import { PlaceholderCard, ScreenShell } from "@/components/ui/Screen";
+import { useActiveMatchForParent, useApproveAndCreateMatch } from "@/hooks/useActiveMatch";
 import { useChildren } from "@/hooks/useChildren";
 import { useMatchRequests } from "@/hooks/useMatchRequests";
 import { useAuthStore } from "@/stores/auth-store";
@@ -23,6 +27,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ParentRequestsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const parentId = session?.user?.id;
   const { children } = useChildren(parentId);
@@ -34,6 +39,37 @@ export default function ParentRequestsScreen() {
     refetch,
     isRefetching,
   } = useMatchRequests(parentId, childIds);
+
+  const { refetch: refetchActiveMatch } = useActiveMatchForParent(parentId);
+  const approve = useApproveAndCreateMatch(parentId);
+
+  function handleApprove(requestId: string) {
+    Alert.alert(
+      t("parent.approveTitle"),
+      t("parent.approveConfirm"),
+      [
+        { text: t("common.tryAgain"), style: "cancel" },
+        {
+          text: t("parent.approveAction"),
+          style: "default",
+          onPress: async () => {
+            try {
+              const matchId = await approve.mutateAsync(requestId);
+              await refetchActiveMatch();
+              router.push({
+                pathname: "/(active-match)",
+                params: { matchId },
+              });
+            } catch (err) {
+              const message =
+                err instanceof Error ? err.message : t("common.tryAgain");
+              Alert.alert(t("common.error"), message);
+            }
+          },
+        },
+      ],
+    );
+  }
 
   return (
     <ScreenShell title={t("parent.requests")} subtitle={t("parent.requestsSubtitle")}>
@@ -52,6 +88,7 @@ export default function ParentRequestsScreen() {
           requests.map((request) => {
             const child = children.find((c) => c.id === request.child_id);
             const statusColor = STATUS_COLORS[request.status] ?? "text-ink-2";
+            const canApprove = request.status === "interested";
 
             return (
               <View
@@ -72,7 +109,17 @@ export default function ParentRequestsScreen() {
                   </Text>
                 ) : null}
                 {request.match_reason ? (
-                  <Text className="text-xs text-teal">{request.match_reason}</Text>
+                  <Text className="text-xs text-teal mb-3">
+                    {request.match_reason}
+                  </Text>
+                ) : null}
+                {canApprove ? (
+                  <PrimaryButton
+                    label={t("parent.approveAction")}
+                    onPress={() => handleApprove(request.id)}
+                    variant="purple"
+                    loading={approve.isPending}
+                  />
                 ) : null}
               </View>
             );

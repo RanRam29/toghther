@@ -9,7 +9,9 @@ import {
 } from "react-native";
 
 import { ChildSelector, MatchCard } from "@/components/parent/MatchCard";
+import { ActiveMatchBanner } from "@/components/shared/ActiveMatchBanner";
 import { PlaceholderCard, ScreenShell } from "@/components/ui/Screen";
+import { useActiveMatchForParent } from "@/hooks/useActiveMatch";
 import { useChildMatches } from "@/hooks/useChildMatches";
 import { useChildren } from "@/hooks/useChildren";
 import { useAuthStore } from "@/stores/auth-store";
@@ -30,6 +32,8 @@ export default function ParentHomeScreen() {
     refetch: refetchChildren,
     isRefetching: childrenRefetching,
   } = useChildren(parentId);
+
+  const { data: activeMatch } = useActiveMatchForParent(parentId);
 
   const {
     data: matches = [],
@@ -53,6 +57,22 @@ export default function ParentHomeScreen() {
 
   return (
     <ScreenShell title={t("parent.homeTitle")} subtitle={subtitle}>
+      {activeMatch ? (
+        <ActiveMatchBanner
+          title={t("activeMatch.bannerEyebrow")}
+          subtitle={t("activeMatch.bannerSubtitle", {
+            name: activeMatch.professional?.display_name ?? "",
+          })}
+          actionLabel={t("activeMatch.bannerAction")}
+          onPress={() =>
+            router.push({
+              pathname: "/(active-match)",
+              params: { matchId: activeMatch.id },
+            })
+          }
+        />
+      ) : null}
+
       {children.length > 0 ? (
         <ChildSelector
           children={children}

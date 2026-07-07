@@ -71,22 +71,43 @@ export async function respondToRequest(
   requestId: string,
   status: "interested" | "rejected",
 ): Promise<MatchRequest> {
-  const { data, error } = await supabase
-    .from("match_requests")
-    .update({ status })
-    .eq("id", requestId)
-    .select("*")
-    .single();
+  // NOTE: RPC not yet reflected in generated types; cast until types regenerate.
+  const { error } = await (supabase.rpc as unknown as (
+    name: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ error: Error | null }>)("respond_to_request", {
+    p_request_id: requestId,
+    p_status: status,
+  });
 
   if (error) throw error;
-  return data;
+
+  const { data: request, error: fetchError } = await supabase
+    .from("match_requests")
+    .select("*")
+    .eq("id", requestId)
+    .single();
+
+  if (fetchError) throw fetchError;
+  return request;
 }
 
 export async function fetchPublishedChildren(): Promise<ChildBasic[]> {
-  const { data, error } = await supabase
-    .from("children")
+  // Query secure children_tier0 view (not in generated types yet).
+  const client = supabase as unknown as {
+    from: (name: string) => {
+      select: (cols: string) => {
+        order: (
+          col: string,
+          opts?: { ascending?: boolean },
+        ) => Promise<{ data: unknown[] | null; error: Error | null }>;
+      };
+    };
+  };
+
+  const { data, error } = await client
+    .from("children_tier0")
     .select(CHILD_BASIC_COLUMNS)
-    .eq("published", true)
     .order("created_at", { ascending: false });
 
   if (error) throw error;

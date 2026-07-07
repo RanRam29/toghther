@@ -1,15 +1,15 @@
 {
-  "last_updated": "2026-07-07T14:15:00Z",
+  "last_updated": "2026-07-07T14:30:00Z",
   "project_id": "flrflktlltmqbiamljlm",
   "agents": {
     "antigravity": {
       "status": "in_progress",
-      "current_task": "Stitch design system + 6 core screens completed. RLS tests next.",
+      "current_task": "Security overhaul deployed (Tier 0 view, secure RPCs, state machine). RLS tests next.",
       "blocked_by": null
     },
     "cursor": {
       "status": "in_progress",
-      "current_task": "Active-match UI completed (GPS check-in card, AI insights, logs list, daily log form). Consumes Antigravity's useCheckin/useDailyLogs hooks. Next: wire matchId from home screens.",
+      "current_task": "Full flow wired end-to-end: active match banner on both dashboards, approve→create match RPC, rich child details, documents list, reviews modal, Edge Function for matches. Next up: file upload picker (needs expo-document-picker install once network is available).",
       "blocked_by": null
     }
   },
@@ -19,6 +19,7 @@
     "db_functions": "completed",
     "seed_data": "completed",
     "db_migration_deploy": "completed",
+    "security_overhaul": "completed",
     "expo_setup": "completed",
     "nativewind_setup": "completed",
     "expo_router": "completed",
@@ -31,11 +32,17 @@
     "ui_design_stitch": "completed",
     "parent_home": "completed",
     "child_profile": "completed",
+    "child_details_rich": "completed",
     "match_request_flow": "completed",
+    "match_approve_and_create": "completed",
     "professional_home": "completed",
     "professional_browse": "completed",
     "professional_profile": "completed",
+    "professional_documents_ui": "completed_without_picker",
     "active_match_dashboard": "completed",
-    "daily_log_form": "completed"
+    "active_match_navigation": "completed",
+    "daily_log_form": "completed",
+    "reviews_submit": "completed",
+    "edge_function_calculate_matches": "wired"
   }
 }

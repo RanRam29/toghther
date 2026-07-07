@@ -8,6 +8,10 @@ export default function ActiveMatchLayout() {
         name="daily-log-form"
         options={{ presentation: "modal", animation: "slide_from_bottom" }}
       />
+      <Stack.Screen
+        name="review"
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+      />
     </Stack>
   );
 }

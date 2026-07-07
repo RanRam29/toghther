@@ -7,6 +7,17 @@ export async function getMatchesForChild(
   childId: string,
   limit = 5,
 ): Promise<ChildMatch[]> {
+  // Prefer the Edge Function (Claude-enriched match_reason) when available.
+  const { data: fnData, error: fnError } = await supabase.functions.invoke(
+    "calculate-matches",
+    { body: { child_id: childId, limit } },
+  );
+
+  if (!fnError && fnData && Array.isArray((fnData as { matches?: unknown }).matches)) {
+    return ((fnData as { matches: ChildMatch[] }).matches) ?? [];
+  }
+
+  // Fallback to direct RPC (still respects RLS).
   const { data, error } = await supabase.rpc("get_matches_for_child", {
     p_child_id: childId,
     p_limit: limit,
@@ -54,4 +65,28 @@ export async function createMatchRequest(
 
   if (error) throw error;
   return data;
+}
+
+export async function approveMatchRequest(requestId: string): Promise<string> {
+  // NOTE: RPC not yet reflected in generated types; cast until types regenerate.
+  const { data, error } = await (supabase.rpc as unknown as (
+    name: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: Error | null }>)("approve_request", {
+    p_request_id: requestId,
+  });
+
+  if (error) throw error;
+  return data as string; // returns match_id
+}
+
+export async function rejectMatchRequest(requestId: string): Promise<void> {
+  const { error } = await (supabase.rpc as unknown as (
+    name: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: Error | null }>)("reject_request", {
+    p_request_id: requestId,
+  });
+
+  if (error) throw error;
 }

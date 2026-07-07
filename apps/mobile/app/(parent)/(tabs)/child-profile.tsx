@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { ChildSelector } from "@/components/parent/MatchCard";
 import { ChipSelect, SwitchRow } from "@/components/ui/ChipSelect";
@@ -27,6 +28,7 @@ const DEFAULT_FRAMEWORK: FrameworkType = "regular_school";
 
 export default function ChildProfileScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const parentId = session?.user?.id;
   const selectedChildId = useParentStore((s) => s.selectedChildId);
@@ -233,13 +235,29 @@ export default function ChildProfileScreen() {
           onChange={setPublished}
         />
 
-        <View className="pb-10 mt-2">
+        <View className="mt-2 mb-3">
           <PrimaryButton
             label={t("parent.saveChild")}
             onPress={handleSave}
             loading={isSaving}
           />
         </View>
+
+        {!isNew && selectedChild ? (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/(parent)/child-details",
+                params: { childId: selectedChild.id },
+              })
+            }
+            className="rounded-card py-4 px-6 items-center border border-purple bg-purple-bg active:opacity-90 mb-10"
+          >
+            <Text className="text-purple-ink text-base font-semibold font-rubik">
+              {t("parent.openDetails")} →
+            </Text>
+          </Pressable>
+        ) : null}
       </ScrollView>
     </ScreenShell>
   );

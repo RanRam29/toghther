@@ -16,6 +16,7 @@ export default function ProfessionalLayout() {
       <Tabs.Screen name="index" options={{ title: t("professional.homeTitle") }} />
       <Tabs.Screen name="profile" options={{ title: t("professional.profile") }} />
       <Tabs.Screen name="browse" options={{ title: t("professional.browse") }} />
+      <Tabs.Screen name="documents" options={{ title: t("professional.documents") }} />
     </Tabs>
   );
 }
