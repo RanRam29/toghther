@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
   public: {
     Tables: {
       audit_log: {
@@ -139,6 +134,13 @@ export type Database = {
             columns: ["child_id"]
             isOneToOne: true
             referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_details_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children_tier0"
             referencedColumns: ["id"]
           },
         ]
@@ -361,6 +363,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "match_requests_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_tier0"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "match_requests_professional_id_fkey"
             columns: ["professional_id"]
             isOneToOne: false
@@ -412,6 +421,13 @@ export type Database = {
             columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_tier0"
             referencedColumns: ["id"]
           },
           {
@@ -630,6 +646,22 @@ export type Database = {
       }
     }
     Views: {
+      children_tier0: {
+        Row: {
+          age: number | null
+          area_general: string | null
+          category: Database["public"]["Enums"]["need_category"] | null
+          created_at: string | null
+          first_name: string | null
+          framework: Database["public"]["Enums"]["framework_type"] | null
+          hours_needed: Json | null
+          id: string | null
+          secondary_category:
+            | Database["public"]["Enums"]["need_category"]
+            | null
+        }
+        Relationships: []
+      }
       geography_columns: {
         Row: {
           coord_dimension: number | null
@@ -669,20 +701,6 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
-        }
-        Relationships: []
-      }
-      children_tier0: {
-        Row: {
-          age: number
-          area_general: string | null
-          category: Database["public"]["Enums"]["need_category"]
-          created_at: string
-          framework: Database["public"]["Enums"]["framework_type"]
-          hours_needed: Json | null
-          id: string
-          first_name: string
-          secondary_category: Database["public"]["Enums"]["need_category"] | null
         }
         Relationships: []
       }
@@ -815,6 +833,7 @@ export type Database = {
             }
             Returns: string
           }
+      approve_request: { Args: { p_request_id: string }; Returns: string }
       calculate_match_score: {
         Args: { p_child_id: string; p_professional_id: string }
         Returns: {
@@ -957,6 +976,23 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_child_details: {
+        Args: { p_child_id: string }
+        Returns: {
+          child_id: string
+          created_at: string
+          diagnosis_full: string
+          full_name: string
+          gender_preference: string
+          id: string
+          notes: string
+          parent_contact: Json
+          updated_at: string
+          what_triggers: string
+          what_works: string
+          win_definition: string
+        }[]
+      }
       get_matches_for_child: {
         Args: { p_child_id: string; p_limit?: number }
         Returns: {
@@ -980,6 +1016,7 @@ export type Database = {
       }
       gettransactionid: { Args: never; Returns: unknown }
       has_active_match: { Args: { p_child_id: string }; Returns: boolean }
+      is_admin: { Args: never; Returns: boolean }
       is_verified_professional: { Args: never; Returns: boolean }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
@@ -1022,6 +1059,11 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      reject_request: { Args: { p_request_id: string }; Returns: undefined }
+      respond_to_request: {
+        Args: { p_request_id: string; p_status: string }
+        Returns: undefined
+      }
       seed_test_data: { Args: never; Returns: string }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
@@ -1628,50 +1670,7 @@ export type Database = {
           is_valid: boolean
         }[]
       }
-      approve_request: {
-        Args: {
-          p_request_id: string
-        }
-        Returns: string
-      }
-      reject_request: {
-        Args: {
-          p_request_id: string
-        }
-        Returns: undefined
-      }
-      withdraw_request: {
-        Args: {
-          p_request_id: string
-        }
-        Returns: undefined
-      }
-      respond_to_request: {
-        Args: {
-          p_request_id: string
-          p_status: string
-        }
-        Returns: undefined
-      }
-      get_child_details: {
-        Args: {
-          p_child_id: string
-        }
-        Returns: {
-          child_id: string
-          created_at: string
-          diagnosis_full: string | null
-          full_name: string | null
-          gender_preference: string | null
-          id: string
-          notes: string | null
-          parent_contact: Json | null
-          updated_at: string
-          what_triggers: string | null
-          what_works: string | null
-          win_definition: string | null
-        }[]
-      }
+      withdraw_request: { Args: { p_request_id: string }; Returns: undefined }
     }
     Enums: {
       document_type:
@@ -1888,3 +1887,4 @@ export const Constants = {
     },
   },
 } as const
+

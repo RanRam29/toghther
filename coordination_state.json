@@ -1,16 +1,16 @@
 {
-  "last_updated": "2026-07-07T14:30:00Z",
+  "last_updated": "2026-07-07T20:30:00Z",
   "project_id": "flrflktlltmqbiamljlm",
   "agents": {
     "antigravity": {
-      "status": "in_progress",
-      "current_task": "Security overhaul deployed (Tier 0 view, secure RPCs, state machine). RLS tests next.",
+      "status": "completed_c4_backend",
+      "current_task": "C4 migration + pgTAP tests authored. Cloud deploy blocked from Cursor env — run scripts/deploy-c4-cloud.ps1 from network-enabled machine.",
       "blocked_by": null
     },
     "cursor": {
-      "status": "ready_for_build",
-      "current_task": "Production-ready: eas.json + app.json fully configured, BUILD.md checklist, temporary casts removed (Antigravity manually added missing types). Awaiting DevOps step: eas login + init + secrets + build --profile preview.",
-      "blocked_by": null
+      "status": "completed_c4_verification",
+      "current_task": "C4 verified end-to-end locally: db reset (12 migrations), test db PASS (7/7 C4 + RLS), types regen with cloud fallback, tsc clean. Scripts: verify-c4.ps1 + deploy-c4-cloud.ps1.",
+      "blocked_by": "supabase_cloud_network_from_cursor_env"
     }
   },
   "tasks": {
@@ -20,6 +20,9 @@
     "seed_data": "completed",
     "db_migration_deploy": "completed",
     "security_overhaul": "completed",
+    "c4_role_escalation": "completed",
+    "c4_role_escalation_local_verified": "completed",
+    "c4_role_escalation_cloud_push": "pending_run_deploy_c4_cloud_script",
     "expo_setup": "completed",
     "nativewind_setup": "completed",
     "expo_router": "completed",

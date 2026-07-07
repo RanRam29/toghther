@@ -6,13 +6,16 @@
 > - **`docs/work-orders/`** — תוכניות ביצוע מלאות (מאסטר `00-ROADMAP.md`: C4, WP1–WP7).
 > - **`docs/`** — ‏ARCHITECTURE · DEV-PROCESS (כולל סדר עדיפויות תקף) · TESTING-STRATEGY · AUTH-SPEC · SECURITY-GUIDELINES.
 > - **`docs/SECURITY-GUIDELINES.md` + `docs/AUTH-SPEC.md`** — פיתוח מונחה־אבטחה, אימות והרשאות, מטריצת הרשאות מלאה. **מחייבים לכל משימה שנוגעת בנתונים.**
-> - **`ARCHITECTURE_REVIEW.md`** — תיקוני אבטחה קריטיים שקודמים לכל פיתוח אחר. **חדש 🔴 C4: כל משתמש יכול למנות עצמו אדמין** (‏`profiles_own_update` בלי WITH CHECK על role) — התיקון הראשון בתור. בנוסף C1 (self-approve), C2/C3 (חשיפת children + audit).
+> - **`ARCHITECTURE_REVIEW.md`** — תיקוני אבטחה קריטיים. ‏**✅ C4 (הסלמת אדמין) נסגר 2026-07-07** — מיגרציה + 7/7 pgTAP ירוקות מקומית. C1/C2/C3 נסגרו ב-`security_overhaul`.
 > - **חדש (D23): אזור מנהל מלא ב-MVP** — route group ‏`(admin)` ב-web; תור האימות (Admin-1) משתלב באבן דרך 3. מפרט: `product/10-ADMIN-SPEC.md`.
 > בנושאי אבטחה/ארכיטקטורה — ARCHITECTURE_REVIEW גובר; בנושאי מוצר/UX — תיק המוצר גובר על DEVELOPMENT_PLAN.md.
 >
-> **🟡 C4 — תיקון נכתב, אימות/דחיפה חסומים בסביבה זו:** `supabase/migrations/20260707120000_c4_protect_profile_role.sql` + `supabase/tests/c4_role_escalation_test.sql`. טריגר שמקפיא `role`/`id` למשתמש מאומת + `is_admin()` מוקשח + הקשחת Storage.
-> **חסימות תשתית (2026-07-07):** (1) Docker Desktop קורס → אין `supabase start` מקומי; (2) גישת DB ישירה לענן נכשלת מהמכונה (`TransportError`, פורט 5432/6543 חסום — גם Cursor דיווח על כך ב-`gen types`). ⇒ אי אפשר `db reset` ולא `db push` מכאן.
-> **נתיב מומלץ להחלת התיקון (C4 חי ומנוצל על DB פעיל!):** להריץ את שתי ה-SQL דרך **Supabase Dashboard → SQL Editor** (HTTPS, לא חסום): קודם המיגרציה, ואז קובץ הבדיקה לאימות שכל 7 עוברות. לאחר מכן ליישב את היסטוריית המיגרציות (`db push`) כשגישת הענן תשוחזר (CI / מכונה עם גישה).
+> **✅ C4 — נסגר מקומית; ענן = צעד אחד (2026-07-07):**
+> 1. Code review + `supabase db reset --local` — 12 מיגרציות כולל `20260707120000_c4_protect_profile_role`.
+> 2. `supabase test db --local` — **PASS** (C4: 7/7 pgTAP + RLS privacy).
+> 3. Types + `tsc --noEmit` — נקי (`is_admin`, RPCs מוקשחים).
+> 4. סקריפטים: `scripts/verify-c4.ps1` (אימות מקומי) · **`scripts/deploy-c4-cloud.ps1`** (push + test בענן).
+> **⏳ ענן:** Cursor חסום ל-Supabase Cloud (`TransportError`). הרץ **`.\scripts\deploy-c4-cloud.ps1`** מהטרמינal שלך — זה סוגר את C4 לגמרי.
 > **🟠 finding חדש H4 (ARCHITECTURE_REVIEW):** `approve_request` יוצר match פעיל מיד — סטייה מ-D10. **לטיפול דו-צדדי אחרי C4** (משפיע על מסכי Cursor שכבר נבנו). אל תתקנו לבד — נתאם.
 >
 > **📮 שאלות לארכיטקט** (סוכן שנתקל בשאלה מוצרית פתוחה — רושם כאן וממשיך במשימה אחרת):
