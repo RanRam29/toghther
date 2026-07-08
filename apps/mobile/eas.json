@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 20.0.0",
+    "version": ">= 18.0.0",
     "appVersionSource": "remote"
   },
   "build": {
@@ -19,8 +19,8 @@
       "ios": { "simulator": false },
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "$EXPO_PUBLIC_SUPABASE_URL",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "$EXPO_PUBLIC_SUPABASE_ANON_KEY"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://flrflktlltmqbiamljlm.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_YK0CeBpzj2f03qHVJ3VEcw_5x--jyFz"
       }
     },
     "preview-simulator": {
