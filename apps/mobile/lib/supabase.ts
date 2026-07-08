@@ -18,7 +18,13 @@ export const isSupabaseConfigured =
   Boolean(supabaseAnonKey) &&
   !supabaseUrl.includes("your-project");
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+// Fall back to inert placeholders when env is missing so the app still renders
+// (and can surface a config error) instead of crashing at module load — createClient
+// throws synchronously on empty url/key, which otherwise blanks the whole app.
+const resolvedUrl = supabaseUrl || "https://unconfigured.supabase.co";
+const resolvedAnonKey = supabaseAnonKey || "unconfigured";
+
+export const supabase = createClient<Database>(resolvedUrl, resolvedAnonKey, {
   auth: {
     storage: Platform.OS === "web" ? undefined : ExpoSecureStoreAdapter,
     autoRefreshToken: true,

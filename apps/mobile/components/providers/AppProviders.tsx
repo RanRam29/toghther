@@ -29,7 +29,8 @@ function AppReady({ children }: { children: ReactNode }) {
 export function AppProviders({ children }: { children: ReactNode }) {
   const language = useLocaleStore((s) => s.language);
   const [i18nReady, setI18nReady] = useState(false);
-  const [fontsLoaded] = useFonts({
+  const [timedOut, setTimedOut] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
     Rubik_400Regular,
     Rubik_500Medium,
     Rubik_700Bold,
@@ -39,7 +40,16 @@ export function AppProviders({ children }: { children: ReactNode }) {
     initI18n(language).finally(() => setI18nReady(true));
   }, [language]);
 
-  if (!fontsLoaded || !i18nReady) {
+  // Safety net: never block rendering forever if fonts fail to load (common on web) —
+  // fall back to the system font after a short timeout instead of a perpetual splash.
+  useEffect(() => {
+    const t = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const fontsSettled = fontsLoaded || !!fontError || timedOut;
+
+  if (!fontsSettled || !i18nReady) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
         <ActivityIndicator size="large" color="#534AB7" />
