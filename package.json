@@ -9,7 +9,8 @@
     "dev": "cd apps/mobile && npx expo start",
     "lint": "cd apps/mobile && npx expo lint",
     "test:matching": "npx jest --config packages/matching/jest.config.js",
-    "types:generate": "npx supabase gen types typescript --linked > packages/shared/src/types/database.ts"
+    "types:generate": "npx supabase gen types typescript --linked > packages/shared/src/types/database.ts",
+    "eas-build-post-install": "npm rebuild lightningcss"
   },
   "engines": {
     "node": ">=18"
