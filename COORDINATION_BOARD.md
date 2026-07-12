@@ -14,9 +14,7 @@
 > 
 > **✅ השלמות פלטפורמה (D46, D48):** Antigravity סגר והעלה מיגרציה (`20260713020000_d46_d48_features.sql`) למימוש: (1) **D48 ("לא מתאים")** כפתור הסתרת משדוכים חד כיוונית (טבלת `match_hides` + פונקציית `hide_match_profile` + סינון במנוע), (2) **D46 (דיווח על יום ללא ליווי)** חופשות שאינן נספרות בחוסר פעילות (טבלת `match_days_off` + פונקציית `mark_day_off`).
 >
-> **✅ התחברות חלופית (Email/Password API):** Antigravity סיים את הוספת התמיכה ב-Email Auth ברמת ה-API והמסד. נוספו הפונקציות `signInWithEmail`, `signUpWithEmail`, `requestPasswordReset`, ו-`updatePassword` ל-`auth-api.ts`, וכן טופל השדה `phone` שיהיה אופציונלי כגיבוי. 
-> 
-> ⚠️ **משימה ל-Cursor (סוכן ה-UI):** נדרש לעדכן את מסך ההתחברות `login.tsx` כדי לתמוך בבחירה בין "טלפון וקוד" (מנגנון קיים) לבין "אימייל וסיסמה". יש לוודא שטופסי ההרשמה דורשים להזין טלפון אם המשתמש נרשם בעזרת אימייל (מועבר דרך ה-`phone` אופציונלי ב-`updateBaseProfile`). כמו כן, יש ליצור מסך לשחזור סיסמה (קריאה ל-`requestPasswordReset` עם האימייל, שמפנה ל-deep link `together://reset-password`) ולטפל בנתיב ה-Deep Link כדי לאפשר הקלדת סיסמה חדשה (קריאה ל-`updatePassword`).
+> **✅ התחברות חלופית ושחזור סיסמה (Full Stack):** Antigravity ביצע את ההטמעה המלאה (גם ה-API וגם ה-UI). נוספו פונקציות ב-`auth-api.ts`, והמסך `login.tsx` שודרג לאפשר בחירה בין טלפון ואימייל. כמו כן נוספו מסכים ל-`forgot-password` ו-`reset-password` שמטפלים ב-Deep Link, ושדה ה"טלפון" נוסף לטפסי האונבורדינג כדי להשלים פערים למשתמשים שנרשמו עם אימייל. 
 > 2. `supabase test db --local` — **PASS** (C4: 7/7 pgTAP + RLS privacy).
 > 3. Types + `tsc --noEmit` — נקי (`is_admin`, RPCs מוקשחים).
 > 4. סקריפטים: `scripts/verify-c4.ps1` (אימות מקומי) · **`scripts/deploy-c4-cloud.ps1`** (push + test בענן).
