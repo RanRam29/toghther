@@ -52,30 +52,30 @@ DECLARE
   v_id UUID;
 BEGIN
   -- ========== AUTH USERS (PARENTS) ==========
-  INSERT INTO auth.users (id, phone, phone_confirmed_at, raw_user_meta_data, aud, role) VALUES
-    (parent_ids[1], '0501111111', now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
-    (parent_ids[2], '0502222222', now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
-    (parent_ids[3], '0503333333', now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
-    (parent_ids[4], '0504444444', now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
-    (parent_ids[5], '0505555555', now(), '{"role": "parent"}', 'authenticated', 'authenticated');
+  INSERT INTO auth.users (id, phone, encrypted_password, phone_confirmed_at, raw_user_meta_data, aud, role) VALUES
+    (parent_ids[1], '0501111111', crypt('password123', gen_salt('bf')), now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
+    (parent_ids[2], '0502222222', crypt('password123', gen_salt('bf')), now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
+    (parent_ids[3], '0503333333', crypt('password123', gen_salt('bf')), now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
+    (parent_ids[4], '0504444444', crypt('password123', gen_salt('bf')), now(), '{"role": "parent"}', 'authenticated', 'authenticated'),
+    (parent_ids[5], '0505555555', crypt('password123', gen_salt('bf')), now(), '{"role": "parent"}', 'authenticated', 'authenticated');
 
   -- ========== AUTH USERS (PROFESSIONALS) ==========
-  INSERT INTO auth.users (id, phone, phone_confirmed_at, raw_user_meta_data, aud, role) VALUES
-    (pro_user_ids[1],  '0521111111', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[2],  '0522222222', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[3],  '0523333333', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[4],  '0524444444', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[5],  '0525555555', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[6],  '0526666666', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[7],  '0527777777', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[8],  '0528888888', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[9],  '0529999999', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[10], '0530000000', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[11], '0531111111', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[12], '0532222222', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[13], '0533333333', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[14], '0534444444', now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
-    (pro_user_ids[15], '0535555555', now(), '{"role": "professional"}', 'authenticated', 'authenticated');
+  INSERT INTO auth.users (id, phone, encrypted_password, phone_confirmed_at, raw_user_meta_data, aud, role) VALUES
+    (pro_user_ids[1],  '0521111111', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[2],  '0522222222', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[3],  '0523333333', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[4],  '0524444444', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[5],  '0525555555', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[6],  '0526666666', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[7],  '0527777777', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[8],  '0528888888', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[9],  '0529999999', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[10], '0530000000', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[11], '0531111111', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[12], '0532222222', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[13], '0533333333', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[14], '0534444444', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated'),
+    (pro_user_ids[15], '0535555555', crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
 
   -- ========== PARENT PROFILES (UPDATE) ==========
   UPDATE profiles SET full_name = 'אבי כהן', area = 'תל אביב', preferred_language = 'he' WHERE id = parent_ids[1];
@@ -246,8 +246,8 @@ BEGIN
   FOR i IN 1..50 LOOP
     v_id := gen_random_uuid();
     -- Insert into auth.users
-    INSERT INTO auth.users (id, phone, phone_confirmed_at, raw_user_meta_data, aud, role)
-    VALUES (v_id, '059' || lpad(i::text, 7, '0'), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
+    INSERT INTO auth.users (id, phone, encrypted_password, phone_confirmed_at, raw_user_meta_data, aud, role)
+    VALUES (v_id, '059' || lpad(i::text, 7, '0'), crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
     
     -- Update profile
     UPDATE profiles SET full_name = 'משלבת דמו ' || i, area = 'תל אביב', preferred_language = 'he' WHERE id = v_id;
