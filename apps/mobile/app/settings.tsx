@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 
@@ -25,22 +25,32 @@ export default function SettingsScreen() {
   const updatePrefs = useUpdateNotificationPrefs(userId);
   const appVersion = Constants.expoConfig?.version ?? "1.0.0";
 
+  async function executeLogout() {
+    const token = getStoredPushToken();
+    if (userId && token) {
+      await removePushToken(userId, token);
+    }
+
+    await supabase.auth.signOut();
+    reset();
+    router.replace("/");
+  }
+
   async function handleLogout() {
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm(t("settings.logoutConfirm"));
+      if (confirmed) {
+        await executeLogout();
+      }
+      return;
+    }
+
     Alert.alert(t("settings.logoutTitle"), t("settings.logoutConfirm"), [
       { text: t("common.cancel"), style: "cancel" },
       {
         text: t("settings.logoutAction"),
         style: "destructive",
-        onPress: async () => {
-          const token = getStoredPushToken();
-          if (userId && token) {
-            await removePushToken(userId, token);
-          }
-
-          await supabase.auth.signOut();
-          reset();
-          router.replace("/");
-        },
+        onPress: executeLogout,
       },
     ]);
   }

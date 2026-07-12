@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { Session } from "@supabase/supabase-js";
 
 import { fetchProfile } from "@/lib/auth-api";
+import { registerForPushNotificationsAsync } from "@/lib/push-notifications";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -20,9 +21,9 @@ export function useAuthBootstrap() {
           const profile = await fetchProfile(session.user.id);
           if (mounted) setProfile(profile);
           // Register token silently if permissions were already granted
-          import("@/lib/push-notifications").then((m) =>
-            m.registerForPushNotificationsAsync(session.user.id, true)
-          ).catch(e => console.warn("Push token silent reg err:", e));
+          registerForPushNotificationsAsync(session.user.id, true).catch((e) =>
+            console.warn("Push token silent reg err:", e)
+          );
         } catch (error) {
           console.warn("[auth] profile fetch failed:", error);
           if (mounted) setProfile(null);

@@ -12,7 +12,8 @@
 >
 > **✅ Architect Audit Fixes (2026-07-12):** Antigravity סגר את הבאגים הדחופים מהדו"ח (`20260712230000_architect_audit_fixes.sql` + `20260712235900_audit_fixes_v2.sql`): (1) **D14** אכיפת דירוג עיוור ב-RLS, (2) **D47** הקפאת משדוכים (pause) ושליחת פוש מעודן וניטרלי בהשעיית משלבת/הורה, (3) **D28** הסרה פיזית של מסמכים מה-Storage בעת מחיקת חשבון ותיקון שגיאת סכמה ב-`anonymize_user`. קוד ה-Backend תקין, נבדק ומועלה לענן. (Cursor: נדרש למחוק את כפתור ייצוא הנתונים מ-`config.tsx`).
 > 
-> **✅ C4 — נסגר מקומית; ענן = צעד אחד (2026-07-07):**
+> **✅ השלמות פלטפורמה (D46, D48):** Antigravity סגר והעלה מיגרציה (`20260713020000_d46_d48_features.sql`) למימוש: (1) **D48 ("לא מתאים")** כפתור הסתרת משדוכים חד כיוונית (טבלת `match_hides` + פונקציית `hide_match_profile` + סינון במנוע), (2) **D46 (דיווח על יום ללא ליווי)** חופשות שאינן נספרות בחוסר פעילות (טבלת `match_days_off` + פונקציית `mark_day_off`).
+>
 > 1. Code review + `supabase db reset --local` — 12 מיגרציות כולל `20260707120000_c4_protect_profile_role`.
 > 2. `supabase test db --local` — **PASS** (C4: 7/7 pgTAP + RLS privacy).
 > 3. Types + `tsc --noEmit` — נקי (`is_admin`, RPCs מוקשחים).
