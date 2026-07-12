@@ -72,6 +72,30 @@ export async function signInWithEmail(email: string, password: string) {
   return data.session;
 }
 
+export async function requestPasswordReset(email: string) {
+  if (!isSupabaseConfigured) {
+    throw new Error("Supabase is not configured. Add credentials to .env");
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "together://reset-password",
+  });
+
+  if (error) throw error;
+}
+
+export async function updatePassword(newPassword: string) {
+  if (!isSupabaseConfigured) {
+    throw new Error("Supabase is not configured. Add credentials to .env");
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) throw error;
+}
+
 export async function fetchProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
