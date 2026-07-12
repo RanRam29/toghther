@@ -37,8 +37,25 @@ export function ProfessionalOnboarding() {
   const [specialties, setSpecialties] = useState<NeedCategory[]>([]);
   const [frameworkTypes, setFrameworkTypes] = useState<FrameworkType[]>([]);
   const [experienceYears, setExperienceYears] = useState("");
+  const [phone, setPhone] = useState("");
   const [cityId, setCityId] = useState(CITY_PRESETS[0].id);
   const [loading, setLoading] = useState(false);
+
+  const needsPhone = !session?.user?.phone;
+
+  function specialtyOptions() {
+    return NEED_CATEGORIES.map((value) => ({
+      value,
+      label: t(`enums.needCategory.${value}`),
+    }));
+  }
+
+  function frameworkOptions() {
+    return FRAMEWORK_TYPES.map((value) => ({
+      value,
+      label: t(`enums.frameworkType.${value}`),
+    }));
+  }
 
   async function handleFinish() {
     if (!session?.user) {
@@ -46,13 +63,13 @@ export function ProfessionalOnboarding() {
       return;
     }
 
-    if (!fullName.trim() || !area.trim()) {
+    const parsedExp = Number.parseInt(experienceYears, 10);
+    if (!fullName.trim() || !area.trim() || (needsPhone && !phone.trim())) {
       Alert.alert(t("common.error"), t("common.required"));
       return;
     }
-
-    if (specialties.length === 0) {
-      Alert.alert(t("common.error"), t("auth.pro.specialtiesRequired"));
+    if (!displayName.trim() || !parsedExp || parsedExp < 0) {
+      Alert.alert(t("common.error"), t("professional.formInvalid"));
       return;
     }
 
@@ -63,6 +80,7 @@ export function ProfessionalOnboarding() {
         area,
         role: "professional",
         language,
+        phone: needsPhone ? phone : undefined,
       });
 
       const city = CITY_PRESETS.find((c) => c.id === cityId) ?? CITY_PRESETS[0];
@@ -96,15 +114,24 @@ export function ProfessionalOnboarding() {
       subtitle={t("auth.pro.subtitle")}
     >
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <TextField
-          label={t("auth.fullNameLabel")}
-          placeholder={t("auth.fullNamePlaceholder")}
-          value={fullName}
-          onChangeText={setFullName}
-          autoComplete="name"
-        />
-
-        <TextField
+          <TextField
+            label={t("professional.fullNameLabel")}
+            placeholder={t("professional.fullNamePlaceholder")}
+            value={fullName}
+            onChangeText={setFullName}
+            autoComplete="name"
+          />
+          {needsPhone && (
+            <TextField
+              label={t("auth.phoneLabel")}
+              placeholder={t("auth.phonePlaceholder")}
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
+              autoComplete="tel"
+            />
+          )}
+          <TextField
           label={t("auth.displayNameLabel")}
           placeholder={t("auth.displayNamePlaceholder")}
           value={displayName}

@@ -44,7 +44,10 @@ export function ParentOnboarding() {
   const [functioningLevel, setFunctioningLevel] = useState(2);
   const [framework, setFramework] = useState<FrameworkType>("regular_school");
   const [communicationVerbal, setCommunicationVerbal] = useState(true);
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const needsPhone = !session?.user?.phone;
 
   function categoryOptions() {
     return NEED_CATEGORIES.map((value) => ({
@@ -60,7 +63,7 @@ export function ParentOnboarding() {
     }
 
     const parsedAge = Number.parseInt(age, 10);
-    if (!fullName.trim() || !area.trim()) {
+    if (!fullName.trim() || !area.trim() || (needsPhone && !phone.trim())) {
       Alert.alert(t("common.error"), t("common.required"));
       return;
     }
@@ -76,6 +79,7 @@ export function ParentOnboarding() {
         area,
         role: "parent",
         language,
+        phone: needsPhone ? phone : undefined,
       });
 
       const city = CITY_PRESETS.find((c) => c.id === cityId) ?? CITY_PRESETS[0];
@@ -126,6 +130,17 @@ export function ParentOnboarding() {
           onChangeText={setFullName}
           autoComplete="name"
         />
+
+        {needsPhone && (
+          <TextField
+            label={t("auth.phoneLabel")}
+            placeholder={t("auth.phonePlaceholder")}
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
+            autoComplete="tel"
+          />
+        )}
 
         <TextField
           label={t("auth.areaLabel")}
