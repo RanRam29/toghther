@@ -1,10 +1,21 @@
 import { useEffect } from "react";
 import { useRouter, useSegments } from "expo-router";
+import { Platform } from "react-native";
 
+import {
+  isStaffUser,
+  isStaffWebContext,
+} from "@/lib/staff-auth";
 import { isProfileComplete } from "@/lib/auth-api";
 import { useAuthStore } from "@/stores/auth-store";
 
-type RouteGroup = "(auth)" | "(parent)" | "(professional)" | "(active-match)";
+type RouteGroup =
+  | "(auth)"
+  | "(parent)"
+  | "(professional)"
+  | "(active-match)"
+  | "(staff)"
+  | "(admin)";
 
 const AUTH_SETUP_SCREENS = new Set([
   "role-select",
@@ -16,6 +27,7 @@ const AUTH_SETUP_SCREENS = new Set([
 function getRoleGroup(role: string | undefined): RouteGroup | null {
   if (role === "parent") return "(parent)";
   if (role === "professional") return "(professional)";
+  if (role === "admin" || role === "supervisor") return "(staff)";
   return null;
 }
 
@@ -32,6 +44,7 @@ export function useProtectedRoute() {
     const inAuthGroup = rootSegment === "(auth)";
     const roleGroup = getRoleGroup(profile?.role);
     const profileComplete = isProfileComplete(profile);
+    const isStaff = isStaffUser(session, profile);
 
     if (!session && !inAuthGroup) {
       router.replace("/(auth)/role-select");
@@ -48,22 +61,57 @@ export function useProtectedRoute() {
         router.replace("/(parent)/(tabs)");
       } else if (roleGroup === "(professional)") {
         router.replace("/(professional)");
+      } else if (isStaff) {
+        router.replace("/(staff)" as never);
       }
       return;
     }
 
-    // Role separation: block cross-role access to the other role's group.
+    if (session && profileComplete && isStaff) {
+      const inStaffGroup =
+        rootSegment === "(staff)" || rootSegment === "(admin)";
+      if (!inStaffGroup && !inAuthGroup) {
+        router.replace(
+          (Platform.OS === "web" ? "/(staff)" : "/(staff)/web-only") as never,
+        );
+        return;
+      }
+    }
+
     if (session && profileComplete && roleGroup) {
       const inParentGroup = rootSegment === "(parent)";
       const inProfessionalGroup = rootSegment === "(professional)";
+      const inStaffGroup =
+        rootSegment === "(staff)" || rootSegment === "(admin)";
 
-      if (roleGroup === "(parent)" && inProfessionalGroup) {
+      if (roleGroup === "(parent)" && (inProfessionalGroup || inStaffGroup)) {
         router.replace("/(parent)/(tabs)");
         return;
       }
-      if (roleGroup === "(professional)" && inParentGroup) {
+      if (roleGroup === "(professional)" && (inParentGroup || inStaffGroup)) {
         router.replace("/(professional)");
         return;
+      }
+      if (isStaff && (inParentGroup || inProfessionalGroup)) {
+        router.replace(
+          (Platform.OS === "web" ? "/(staff)" : "/(staff)/web-only") as never,
+        );
+        return;
+      }
+    }
+
+    if (
+      session &&
+      profileComplete &&
+      (rootSegment === "(staff)" || rootSegment === "(admin)") &&
+      !isStaff
+    ) {
+      if (profile?.role === "parent") {
+        router.replace("/(parent)/(tabs)");
+      } else if (profile?.role === "professional") {
+        router.replace("/(professional)");
+      } else {
+        router.replace("/(auth)/role-select");
       }
     }
   }, [session, profile, segments, isHydrated, router]);

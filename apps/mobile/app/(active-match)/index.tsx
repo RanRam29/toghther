@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -12,11 +13,19 @@ import {
 
 import { CheckinCard } from "@/components/active-match/CheckinCard";
 import { DailyLogRow, InsightsCard } from "@/components/active-match/InsightsCard";
+import { ProfileViewsCard } from "@/components/active-match/ProfileViewsCard";
+import { TodayStatusCard } from "@/components/active-match/TodayStatusCard";
+import { TrendChart } from "@/components/active-match/TrendChart";
 import { ScreenShell } from "@/components/ui/Screen";
 import { useActiveMatchForParent, useActiveMatchForProfessional, useEndMatch } from "@/hooks/useActiveMatch";
 import { useCheckin } from "@/hooks/useCheckin";
+import { useTodayCheckin } from "@/hooks/useCheckins";
 import { useGetDailyLogs } from "@/hooks/useDailyLogs";
+import { useMatchMetricKeys, useMetricsForChild } from "@/hooks/useMetrics";
+import { useProfileViews } from "@/hooks/useProfileViews";
 import { useMyProfessional } from "@/hooks/useProfessional";
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import { useAuthStore } from "@/stores/auth-store";
 
 function formatTime(date: Date, locale: string) {
@@ -54,8 +63,11 @@ export default function ActiveMatchScreen() {
   const isProfessional = profile?.role === "professional";
 
   const checkin = useCheckin(matchId);
+  const { todayCheckin, refetch: refetchCheckins } = useTodayCheckin(matchId);
   const logs = useGetDailyLogs(matchId);
   const endMatch = useEndMatch();
+  const matchMetrics = useMatchMetricKeys(matchId);
+  const catalog = useMetricsForChild(matchMetrics.data?.childId);
 
   const parentActive = useActiveMatchForParent(
     !isProfessional ? userId : undefined,
@@ -66,12 +78,49 @@ export default function ActiveMatchScreen() {
   );
   const activeMatch = isProfessional ? proActive.data : parentActive.data;
   const professionalId = activeMatch?.professional?.id;
+  const childId = activeMatch?.child?.id ?? matchMetrics.data?.childId;
+  const profileViews = useProfileViews(!isProfessional ? childId : undefined);
 
   const latestLog = logs.data?.[0];
+  const metricKeys = matchMetrics.data?.metricKeys ?? [];
+  const metricLabels = Object.fromEntries(
+    (catalog.data ?? []).map((m) => [
+      m.key,
+      i18n.language === "he" ? m.he_label : m.en_label,
+    ]),
+  );
+  const aiContent = isProfessional ? latestLog?.ai_strategy : latestLog?.ai_summary;
+  const aiEmptyLabel = latestLog && !aiContent
+    ? t("activeMatch.aiPreparing")
+    : t("activeMatch.aiEmpty");
+
+  const trackedAi = useRef(false);
+  const trackedTrend = useRef(false);
+
+  useEffect(() => {
+    if (!isProfessional && matchId && aiContent && !trackedAi.current) {
+      trackedAi.current = true;
+      void track(AnalyticsEvents.AI_SUMMARY_VIEWED, { match_id: matchId });
+    }
+  }, [isProfessional, matchId, aiContent]);
+
+  useEffect(() => {
+    if (
+      !isProfessional &&
+      matchId &&
+      logs.data &&
+      logs.data.length > 0 &&
+      !trackedTrend.current
+    ) {
+      trackedTrend.current = true;
+      void track(AnalyticsEvents.TREND_CHART_VIEWED, { match_id: matchId });
+    }
+  }, [isProfessional, matchId, logs.data]);
 
   async function handleCheckIn() {
     try {
       await checkin.checkIn();
+      refetchCheckins();
     } catch (err) {
       const message = err instanceof Error ? err.message : t("common.tryAgain");
       Alert.alert(t("common.error"), message);
@@ -90,14 +139,13 @@ export default function ActiveMatchScreen() {
           onPress: async () => {
             try {
               await endMatch.mutateAsync({ matchId });
-              if (professionalId) {
-                router.replace({
-                  pathname: "/(active-match)/review",
-                  params: { matchId, professionalId },
-                });
-              } else {
-                router.back();
-              }
+              router.replace({
+                pathname: "/(active-match)/review",
+                params: {
+                  matchId,
+                  professionalId: professionalId ?? activeMatch?.professional_id ?? "",
+                },
+              });
             } catch (err) {
               const message =
                 err instanceof Error ? err.message : t("common.tryAgain");
@@ -126,6 +174,16 @@ export default function ActiveMatchScreen() {
 
   const now = new Date();
   const timeLabel = formatTime(now, i18n.language);
+  const proName = activeMatch?.professional?.display_name ?? "";
+  const todayCheckinTime = todayCheckin
+    ? formatTime(new Date(todayCheckin.created_at), i18n.language)
+    : null;
+
+  function handleRefresh() {
+    logs.refetch();
+    refetchCheckins();
+    if (!isProfessional) profileViews.refetch();
+  }
 
   return (
     <ScreenShell
@@ -135,10 +193,27 @@ export default function ActiveMatchScreen() {
       <ScrollView
         className="flex-1"
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={() => undefined} />
+          <RefreshControl
+            refreshing={logs.isRefetching || profileViews.isRefetching}
+            onRefresh={handleRefresh}
+          />
         }
         showsVerticalScrollIndicator={false}
       >
+        {!isProfessional ? (
+          <TodayStatusCard
+            message={
+              todayCheckin?.is_valid === true
+                ? t("activeMatch.arrivedToday", {
+                    name: proName,
+                    time: todayCheckinTime ?? "",
+                  })
+                : t("activeMatch.notArrivedToday", { name: proName })
+            }
+            hasCheckedIn={todayCheckin?.is_valid === true}
+          />
+        ) : null}
+
         {isProfessional ? (
           <CheckinCard
             title={t("activeMatch.checkinTitle")}
@@ -165,10 +240,31 @@ export default function ActiveMatchScreen() {
               ? t("activeMatch.aiStrategyTitle")
               : t("activeMatch.aiSummaryTitle")
           }
-          emptyLabel={t("activeMatch.aiEmpty")}
-          content={isProfessional ? latestLog?.ai_strategy : latestLog?.ai_summary}
+          emptyLabel={aiEmptyLabel}
+          content={aiContent}
           variant={isProfessional ? "teal" : "purple"}
         />
+
+        {!isProfessional && logs.data && logs.data.length > 0 ? (
+          <TrendChart
+            title={t("activeMatch.trendTitle")}
+            emptyLabel={t("activeMatch.trendEmpty")}
+            insufficientLabel={t("activeMatch.trendInsufficient")}
+            metricLabels={metricLabels}
+            metricKeys={metricKeys}
+            logs={logs.data}
+          />
+        ) : null}
+
+        {!isProfessional ? (
+          <ProfileViewsCard
+            title={t("activeMatch.profileViewsTitle")}
+            emptyLabel={t("activeMatch.profileViewsEmpty")}
+            entries={profileViews.data ?? []}
+            formatDate={(iso) => formatDate(iso, i18n.language)}
+            anonymousLabel={t("reviews.anonymous")}
+          />
+        ) : null}
 
         <View className="flex-row items-center justify-between mt-2 mb-3">
           <Text className="text-base font-bold text-ink font-rubik">
@@ -206,9 +302,30 @@ export default function ActiveMatchScreen() {
               dateLabel={formatDate(log.log_date, i18n.language)}
               mood={log.mood}
               notes={log.notes}
+              summary={!isProfessional ? log.ai_summary : log.ai_strategy}
+              noReportLabel={t("activeMatch.noReportDay")}
             />
           ))
         )}
+
+        {!isProfessional ? (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/(parent)/match-permissions",
+                params: {
+                  matchId,
+                  childId: childId ?? "",
+                },
+              } as never)
+            }
+            className="rounded-card border border-purple py-3 items-center mb-4 active:opacity-90"
+          >
+            <Text className="text-purple font-semibold text-sm font-rubik">
+              {t("permissions.openAction")}
+            </Text>
+          </Pressable>
+        ) : null}
 
         <View className="mt-8 mb-10">
           <Pressable

@@ -1,8 +1,11 @@
 {
   "expo": {
-    "name": "Together",
+    "name": "תמיד ביחד",
     "slug": "together",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "together",
@@ -60,6 +63,13 @@
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "יש צורך במיקום כדי לבצע צ'ק-אין GPS בתחילת המשמרת (EVV)"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#534AB7"
         }
       ]
     ],

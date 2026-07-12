@@ -7,8 +7,133 @@
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
+      admin_notes: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          note: string
+          target_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          note: string
+          target_user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          note?: string
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notes_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_match_reasons: {
+        Row: {
+          child_id: string
+          created_at: string
+          id: string
+          professional_id: string
+          reason_text: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          id?: string
+          professional_id: string
+          reason_text: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          id?: string
+          professional_id?: string
+          reason_text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_match_reasons_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_match_reasons_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_tier0"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_match_reasons_professional_id_fkey"
+            columns: ["professional_id"]
+            isOneToOne: false
+            referencedRelation: "professionals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          properties: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          properties?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          properties?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -55,6 +180,9 @@ export type Database = {
       }
       checkins: {
         Row: {
+          checkout_at: string | null
+          checkout_location: unknown
+          checkout_valid: boolean | null
           created_at: string
           id: string
           is_valid: boolean | null
@@ -62,6 +190,9 @@ export type Database = {
           match_id: string
         }
         Insert: {
+          checkout_at?: string | null
+          checkout_location?: unknown
+          checkout_valid?: boolean | null
           created_at?: string
           id?: string
           is_valid?: boolean | null
@@ -69,6 +200,9 @@ export type Database = {
           match_id: string
         }
         Update: {
+          checkout_at?: string | null
+          checkout_location?: unknown
+          checkout_valid?: boolean | null
           created_at?: string
           id?: string
           is_valid?: boolean | null
@@ -149,8 +283,10 @@ export type Database = {
         Row: {
           age: number
           category: Database["public"]["Enums"]["need_category"]
+          communication_language: string | null
           communication_verbal: boolean
           created_at: string
+          deleted_at: string | null
           first_name: string
           framework: Database["public"]["Enums"]["framework_type"]
           functioning_level: number
@@ -163,13 +299,17 @@ export type Database = {
           secondary_category:
             | Database["public"]["Enums"]["need_category"]
             | null
+          secondary_parent_id: string | null
+          secondary_parent_permissions: Json | null
           updated_at: string
         }
         Insert: {
           age: number
           category: Database["public"]["Enums"]["need_category"]
+          communication_language?: string | null
           communication_verbal?: boolean
           created_at?: string
+          deleted_at?: string | null
           first_name: string
           framework: Database["public"]["Enums"]["framework_type"]
           functioning_level: number
@@ -182,13 +322,17 @@ export type Database = {
           secondary_category?:
             | Database["public"]["Enums"]["need_category"]
             | null
+          secondary_parent_id?: string | null
+          secondary_parent_permissions?: Json | null
           updated_at?: string
         }
         Update: {
           age?: number
           category?: Database["public"]["Enums"]["need_category"]
+          communication_language?: string | null
           communication_verbal?: boolean
           created_at?: string
+          deleted_at?: string | null
           first_name?: string
           framework?: Database["public"]["Enums"]["framework_type"]
           functioning_level?: number
@@ -201,6 +345,8 @@ export type Database = {
           secondary_category?:
             | Database["public"]["Enums"]["need_category"]
             | null
+          secondary_parent_id?: string | null
+          secondary_parent_permissions?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -316,6 +462,7 @@ export type Database = {
           child_id: string
           cover_letter: string | null
           created_at: string
+          decline_reason: string | null
           id: string
           initiated_by: string
           match_reason: string | null
@@ -330,6 +477,7 @@ export type Database = {
           child_id: string
           cover_letter?: string | null
           created_at?: string
+          decline_reason?: string | null
           id?: string
           initiated_by?: string
           match_reason?: string | null
@@ -344,6 +492,7 @@ export type Database = {
           child_id?: string
           cover_letter?: string | null
           created_at?: string
+          decline_reason?: string | null
           id?: string
           initiated_by?: string
           match_reason?: string | null
@@ -385,6 +534,7 @@ export type Database = {
           ended_at: string | null
           id: string
           match_reason: string | null
+          metric_keys: string[] | null
           professional_id: string
           request_id: string | null
           score: number | null
@@ -397,6 +547,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           match_reason?: string | null
+          metric_keys?: string[] | null
           professional_id: string
           request_id?: string | null
           score?: number | null
@@ -409,6 +560,7 @@ export type Database = {
           ended_at?: string | null
           id?: string
           match_reason?: string | null
+          metric_keys?: string[] | null
           professional_id?: string
           request_id?: string | null
           score?: number | null
@@ -446,13 +598,106 @@ export type Database = {
           },
         ]
       }
+      metric_catalog: {
+        Row: {
+          categories: Database["public"]["Enums"]["need_category"][]
+          en_label: string
+          he_label: string
+          is_core: boolean
+          key: string
+        }
+        Insert: {
+          categories?: Database["public"]["Enums"]["need_category"][]
+          en_label: string
+          he_label: string
+          is_core?: boolean
+          key: string
+        }
+        Update: {
+          categories?: Database["public"]["Enums"]["need_category"][]
+          en_label?: string
+          he_label?: string
+          is_core?: boolean
+          key?: string
+        }
+        Relationships: []
+      }
+      notification_prefs: {
+        Row: {
+          checkin: boolean
+          daily_summary: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin?: boolean
+          daily_summary?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin?: boolean
+          daily_summary?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      parent_invitations: {
+        Row: {
+          child_id: string
+          created_at: string
+          id: string
+          invited_phone: string
+          inviter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          id?: string
+          invited_phone: string
+          inviter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          id?: string
+          invited_phone?: string
+          inviter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_invitations_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_invitations_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_tier0"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professionals: {
         Row: {
+          assigned_at: string | null
+          assigned_supervisor_id: string | null
           availability: Json | null
           backup_available: boolean
           bio: string | null
           certifications: string[]
           created_at: string
+          deleted_at: string | null
           display_name: string
           experience_years: number | null
           framework_types: Database["public"]["Enums"]["framework_type"][]
@@ -466,16 +711,20 @@ export type Database = {
           type: string
           updated_at: string
           user_id: string
+          verification_checklist: Json | null
           verified: Database["public"]["Enums"]["verification_status"]
           verified_at: string | null
           verified_by: string | null
         }
         Insert: {
+          assigned_at?: string | null
+          assigned_supervisor_id?: string | null
           availability?: Json | null
           backup_available?: boolean
           bio?: string | null
           certifications?: string[]
           created_at?: string
+          deleted_at?: string | null
           display_name: string
           experience_years?: number | null
           framework_types?: Database["public"]["Enums"]["framework_type"][]
@@ -489,16 +738,20 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id: string
+          verification_checklist?: Json | null
           verified?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
+          assigned_at?: string | null
+          assigned_supervisor_id?: string | null
           availability?: Json | null
           backup_available?: boolean
           bio?: string | null
           certifications?: string[]
           created_at?: string
+          deleted_at?: string | null
           display_name?: string
           experience_years?: number | null
           framework_types?: Database["public"]["Enums"]["framework_type"][]
@@ -512,11 +765,19 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+          verification_checklist?: Json | null
           verified?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
           verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "professionals_assigned_supervisor_id_fkey"
+            columns: ["assigned_supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "professionals_user_id_fkey"
             columns: ["user_id"]
@@ -538,34 +799,67 @@ export type Database = {
           area: string | null
           avatar_url: string | null
           created_at: string
+          deleted_at: string | null
           full_name: string | null
           id: string
           phone: string | null
           preferred_language: string
           role: Database["public"]["Enums"]["user_role"]
+          suspended_at: string | null
           updated_at: string
         }
         Insert: {
           area?: string | null
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           full_name?: string | null
           id: string
           phone?: string | null
           preferred_language?: string
           role: Database["public"]["Enums"]["user_role"]
+          suspended_at?: string | null
           updated_at?: string
         }
         Update: {
           area?: string | null
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           full_name?: string | null
           id?: string
           phone?: string | null
           preferred_language?: string
           role?: Database["public"]["Enums"]["user_role"]
+          suspended_at?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -644,6 +938,68 @@ export type Database = {
         }
         Relationships: []
       }
+      supervisor_document_views: {
+        Row: {
+          document_id: string
+          supervisor_id: string
+          viewed_at: string
+        }
+        Insert: {
+          document_id: string
+          supervisor_id: string
+          viewed_at?: string
+        }
+        Update: {
+          document_id?: string
+          supervisor_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supervisor_document_views_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "document_uploads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supervisor_document_views_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_config: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_config_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       children_tier0: {
@@ -701,6 +1057,17 @@ export type Database = {
           f_table_schema?: unknown
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      view_parent_funnel: {
+        Row: {
+          conversion_to_match_pct: number | null
+          conversion_to_request_pct: number | null
+          parents_activated: number | null
+          parents_sent_request: number | null
+          parents_viewed_matches: number | null
+          parents_with_match: number | null
         }
         Relationships: []
       }
@@ -795,6 +1162,10 @@ export type Database = {
         Returns: unknown
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      accept_parent_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: undefined
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -833,7 +1204,50 @@ export type Database = {
             }
             Returns: string
           }
-      approve_request: { Args: { p_request_id: string }; Returns: string }
+      admin_log_reasoned_view: {
+        Args: { p_reason: string; p_resource: string; p_resource_id: string }
+        Returns: undefined
+      }
+      admin_reject_document: {
+        Args: { p_doc_id: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_release_supervisor_assignment: {
+        Args: { p_pro_id: string }
+        Returns: undefined
+      }
+      admin_restore_user: { Args: { p_user_id: string }; Returns: undefined }
+      admin_set_config: {
+        Args: { p_key: string; p_value: Json }
+        Returns: undefined
+      }
+      admin_suspend_user: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_unpublish_child: {
+        Args: { p_child_id: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_update_metric_catalog: {
+        Args: {
+          p_en_label: string
+          p_he_label: string
+          p_is_core: boolean
+          p_key: string
+        }
+        Returns: undefined
+      }
+      admin_verify_professional: {
+        Args: { p_checklist: Json; p_pro_id: string }
+        Returns: undefined
+      }
+      anonymize_user: { Args: { p_user_id: string }; Returns: undefined }
+      approve_request: { Args: { p_request_id: string }; Returns: undefined }
+      availability_overlaps: {
+        Args: { avail: Json; needed: Json }
+        Returns: boolean
+      }
       calculate_match_score: {
         Args: { p_child_id: string; p_professional_id: string }
         Returns: {
@@ -841,9 +1255,14 @@ export type Database = {
           score: number
         }[]
       }
+      check_admin_mfa: { Args: never; Returns: undefined }
       create_match_from_request: {
         Args: { p_request_id: string }
         Returns: string
+      }
+      decline_after_intro: {
+        Args: { p_reason?: string; p_request_id: string }
+        Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
@@ -877,7 +1296,12 @@ export type Database = {
         | { Args: { schema_name: string; table_name: string }; Returns: string }
         | { Args: { table_name: string }; Returns: string }
       enablelongtransactions: { Args: never; Returns: string }
+      end_match: {
+        Args: { p_match_id: string; p_reason?: string }
+        Returns: undefined
+      }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      export_system_data: { Args: never; Returns: Json }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -993,6 +1417,25 @@ export type Database = {
           win_definition: string
         }[]
       }
+      get_intro_contact: {
+        Args: { p_request_id: string }
+        Returns: {
+          display_name: string
+          phone: string
+          professional_id: string
+        }[]
+      }
+      get_live_ops_alerts: {
+        Args: never
+        Returns: {
+          alert_id: string
+          alert_type: string
+          created_at: string
+          details: Json
+          resource_id: string
+          severity: string
+        }[]
+      }
       get_matches_for_child: {
         Args: { p_child_id: string; p_limit?: number }
         Returns: {
@@ -1008,6 +1451,22 @@ export type Database = {
           specialties: Database["public"]["Enums"]["need_category"][]
         }[]
       }
+      get_metrics_for_child: {
+        Args: { p_child_id: string }
+        Returns: {
+          categories: Database["public"]["Enums"]["need_category"][]
+          en_label: string
+          he_label: string
+          is_core: boolean
+          key: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "metric_catalog"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_professional_id: { Args: never; Returns: string }
       get_tier_for_child: { Args: { p_child_id: string }; Returns: number }
       get_user_role: {
@@ -1016,9 +1475,26 @@ export type Database = {
       }
       gettransactionid: { Args: never; Returns: unknown }
       has_active_match: { Args: { p_child_id: string }; Returns: boolean }
+      invite_secondary_parent: {
+        Args: { p_child_id: string; p_phone: string }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
+      is_staff_verifier: { Args: never; Returns: boolean }
+      is_supervisor: { Args: never; Returns: boolean }
       is_verified_professional: { Args: never; Returns: boolean }
       longtransactionsenabled: { Args: never; Returns: boolean }
+      notify_push: {
+        Args: {
+          p_body: string
+          p_category?: string
+          p_data?: Json
+          p_title: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      pause_match: { Args: { p_match_id: string }; Returns: undefined }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
@@ -1060,11 +1536,20 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       reject_request: { Args: { p_request_id: string }; Returns: undefined }
+      remove_secondary_parent: {
+        Args: { p_child_id: string }
+        Returns: undefined
+      }
       respond_to_request: {
         Args: { p_request_id: string; p_status: string }
         Returns: undefined
       }
+      resume_match: { Args: { p_match_id: string }; Returns: undefined }
       seed_test_data: { Args: never; Returns: string }
+      set_match_metrics: {
+        Args: { p_keys: string[]; p_match_id: string }
+        Returns: undefined
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
@@ -1646,7 +2131,39 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
+      submit_review: {
+        Args: { p_criteria: Json; p_match_id: string; p_text: string }
+        Returns: undefined
+      }
+      supervisor_claim_professional: {
+        Args: { p_pro_id: string }
+        Returns: undefined
+      }
+      supervisor_log_document_view: {
+        Args: { p_doc_id: string }
+        Returns: undefined
+      }
+      supervisor_reject_document: {
+        Args: { p_doc_id: string; p_reason: string }
+        Returns: Json
+      }
+      supervisor_verify_professional: {
+        Args: { p_checklist: Json; p_pro_id: string }
+        Returns: undefined
+      }
+      track_event: {
+        Args: { p_event_name: string; p_properties?: Json }
+        Returns: undefined
+      }
+      transfer_primary_parent: {
+        Args: { p_child_id: string }
+        Returns: undefined
+      }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_secondary_permissions: {
+        Args: { p_child_id: string; p_permissions: Json }
+        Returns: undefined
+      }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
@@ -1666,6 +2183,18 @@ export type Database = {
         }
         Returns: {
           checkin_id: string
+          distance_m: number
+          is_valid: boolean
+        }[]
+      }
+      verify_checkout: {
+        Args: {
+          p_checkin_id: string
+          p_geofence_radius_m?: number
+          p_latitude: number
+          p_longitude: number
+        }
+        Returns: {
           distance_m: number
           is_valid: boolean
         }[]
@@ -1707,7 +2236,7 @@ export type Database = {
         | "speech"
         | "other"
       reviewer_role: "parent" | "professional"
-      user_role: "parent" | "professional" | "admin"
+      user_role: "parent" | "professional" | "admin" | "supervisor"
       verification_status: "pending" | "submitted" | "verified" | "rejected"
     }
     CompositeTypes: {
@@ -1882,9 +2411,8 @@ export const Constants = {
         "other",
       ],
       reviewer_role: ["parent", "professional"],
-      user_role: ["parent", "professional", "admin"],
+      user_role: ["parent", "professional", "admin", "supervisor"],
       verification_status: ["pending", "submitted", "verified", "rejected"],
     },
   },
 } as const
-

@@ -15,6 +15,9 @@ import i18n, { initI18n } from "@/i18n";
 import { queryClient } from "@/lib/query-client";
 import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
 import { useProtectedRoute } from "@/hooks/useProtectedRoute";
+import { usePushSetup } from "@/hooks/usePushSetup";
+import { PushPermissionProvider } from "@/components/shared/PushPermissionProvider";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useLocaleStore } from "@/stores/auth-store";
 
 const GestureHandlerRootView =
@@ -23,7 +26,13 @@ const GestureHandlerRootView =
 function AppReady({ children }: { children: ReactNode }) {
   useAuthBootstrap();
   useProtectedRoute();
-  return <>{children}</>;
+  usePushSetup();
+  return (
+    <>
+      {children}
+      <PushPermissionProvider />
+    </>
+  );
 }
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -62,7 +71,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <I18nextProvider i18n={i18n}>
-            <AppReady>{children}</AppReady>
+            <View style={{ flex: 1 }}>
+              <OfflineBanner />
+              <View style={{ flex: 1 }}>
+                <AppReady>{children}</AppReady>
+              </View>
+            </View>
           </I18nextProvider>
         </QueryClientProvider>
       </SafeAreaProvider>

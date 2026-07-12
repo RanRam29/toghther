@@ -10,6 +10,8 @@ import {
   fetchProfile,
   updateBaseProfile,
 } from "@/lib/auth-api";
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import {
   CITY_PRESETS,
   FRAMEWORK_TYPES,
@@ -77,7 +79,7 @@ export function ParentOnboarding() {
       });
 
       const city = CITY_PRESETS.find((c) => c.id === cityId) ?? CITY_PRESETS[0];
-      await completeParentOnboarding(session.user.id, {
+      const childId = await completeParentOnboarding(session.user.id, {
         firstName,
         age: parsedAge,
         category,
@@ -87,6 +89,11 @@ export function ParentOnboarding() {
         communicationVerbal,
         needs: {},
         city: { lng: city.lng, lat: city.lat },
+      });
+
+      void track(AnalyticsEvents.CHILD_PROFILE_COMPLETED, {
+        child_id: childId,
+        category,
       });
 
       const profile = await fetchProfile(session.user.id);

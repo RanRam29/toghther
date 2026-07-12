@@ -1,0 +1,23 @@
+/** Event names — keep in sync with product/08-ANALYTICS-EVENTS.md */
+export const AnalyticsEvents = {
+  SIGNUP_COMPLETED: "signup_completed",
+  CHILD_PROFILE_COMPLETED: "child_profile_completed",
+  CHILD_PUBLISHED: "child_published",
+  MATCHES_VIEWED: "matches_viewed",
+  MATCH_PROFILE_VIEWED: "match_profile_viewed",
+  REQUEST_SENT: "request_sent",
+  REQUEST_RESPONSE_SEEN: "request_response_seen",
+  REQUEST_APPROVED: "request_approved",
+  MATCH_CREATED: "match_created",
+  MATCH_ENDED: "match_ended",
+  PRO_ONBOARDING_COMPLETED: "pro_onboarding_completed",
+  PRO_DOCS_SUBMITTED: "pro_docs_submitted",
+  PRO_VERIFIED: "pro_verified",
+  PRO_REQUEST_RESPONDED: "pro_request_responded",
+  PRO_BROWSE_INTEREST: "pro_browse_interest",
+  CHECKIN_DONE: "checkin_done",
+  DAILY_LOG_SUBMITTED: "daily_log_submitted",
+  AI_SUMMARY_VIEWED: "ai_summary_viewed",
+  TREND_CHART_VIEWED: "trend_chart_viewed",
+  REVIEW_SUBMITTED: "review_submitted",
+} as const;

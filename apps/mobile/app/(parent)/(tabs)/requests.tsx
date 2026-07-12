@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 
+import { ApproveDisclosureSheet } from "@/components/parent/ApproveDisclosureSheet";
 import { PlaceholderCard, ScreenShell } from "@/components/ui/Screen";
 import { useChildren } from "@/hooks/useChildren";
 import {
@@ -46,23 +48,28 @@ export default function ParentRequestsScreen() {
   const approveRequest = useApproveMatchRequest(parentId);
   const rejectRequest = useRejectMatchRequest(parentId);
 
-  async function handleApprove(requestId: string) {
+  const [pendingApproveId, setPendingApproveId] = useState<string | null>(null);
+  const disclosureChild = children.find(
+    (c) => c.id === requests.find((r) => r.id === pendingApproveId)?.child_id,
+  );
+
+  const disclosureItems = [
+    t("parent.disclosureFullName"),
+    t("parent.disclosureDiagnosis"),
+    t("parent.disclosureWhatWorks"),
+    t("parent.disclosureContact"),
+  ];
+
+  async function confirmApprove() {
+    if (!pendingApproveId) return;
+    const approvedId = pendingApproveId;
     try {
-      const matchId = await approveRequest.mutateAsync(requestId);
-      Alert.alert(
-        t("parent.requestApproved") || "ההתאמה אושרה",
-        t("parent.requestApprovedDesc") || "ההתאמה נוצרה בהצלחה. אתה מועבר ללוח הבקרה.",
-        [
-          {
-            text: t("common.continue") || "המשך",
-            onPress: () =>
-              router.push({
-                pathname: "/(active-match)",
-                params: { matchId },
-              }),
-          },
-        ]
-      );
+      await approveRequest.mutateAsync(approvedId);
+      setPendingApproveId(null);
+      router.push({
+        pathname: "/(parent)/intro-detail",
+        params: { requestId: approvedId },
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : t("common.tryAgain");
       Alert.alert(t("common.error"), message);
@@ -70,30 +77,39 @@ export default function ParentRequestsScreen() {
   }
 
   async function handleReject(requestId: string) {
-    Alert.alert(
-      t("parent.rejectTitle") || "דחיית בקשה",
-      t("parent.rejectConfirm") || "האם אתה בטוח שברצונך לדחות את מועמדות המשלבת?",
-      [
-        { text: t("common.cancel") || "ביטול", style: "cancel" },
-        {
-          text: t("parent.rejectAction") || "דחה",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await rejectRequest.mutateAsync(requestId);
-              Alert.alert(t("parent.requestRejected") || "הבקשה נדחתה בהצלחה");
-            } catch (err) {
-              const message = err instanceof Error ? err.message : t("common.tryAgain");
-              Alert.alert(t("common.error"), message);
-            }
-          },
+    Alert.alert(t("parent.rejectTitle"), t("parent.rejectConfirm"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("parent.rejectAction"),
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await rejectRequest.mutateAsync(requestId);
+            Alert.alert(t("parent.requestRejected"));
+          } catch (err) {
+            const message = err instanceof Error ? err.message : t("common.tryAgain");
+            Alert.alert(t("common.error"), message);
+          }
         },
-      ]
-    );
+      },
+    ]);
   }
 
   return (
     <ScreenShell title={t("parent.requests")} subtitle={t("parent.requestsSubtitle")}>
+      <ApproveDisclosureSheet
+        visible={Boolean(pendingApproveId)}
+        childName={disclosureChild?.first_name ?? ""}
+        title={t("parent.disclosureTitle")}
+        subtitle={t("parent.disclosureSubtitle")}
+        items={disclosureItems}
+        confirmLabel={t("parent.disclosureConfirm")}
+        cancelLabel={t("common.cancel")}
+        onConfirm={confirmApprove}
+        onCancel={() => setPendingApproveId(null)}
+        loading={approveRequest.isPending}
+      />
+
       <ScrollView
         className="flex-1"
         refreshControl={
@@ -132,20 +148,18 @@ export default function ParentRequestsScreen() {
                   </Text>
                 ) : null}
                 {request.match_reason ? (
-                  <Text className="text-xs text-teal mb-3">
-                    {request.match_reason}
-                  </Text>
+                  <Text className="text-xs text-teal mb-3">{request.match_reason}</Text>
                 ) : null}
 
                 {showActions ? (
                   <View className="flex-row gap-2 mt-4">
                     <Pressable
-                      onPress={() => handleApprove(request.id)}
+                      onPress={() => setPendingApproveId(request.id)}
                       disabled={approveRequest.isPending || rejectRequest.isPending}
                       className="flex-1 bg-purple rounded-full py-2 items-center justify-center active:opacity-90"
                     >
                       <Text className="text-white text-sm font-semibold font-rubik">
-                        {t("parent.approveRequest") || "אשר התאמה"}
+                        {t("parent.approveRequest")}
                       </Text>
                     </Pressable>
                     <Pressable
@@ -154,7 +168,23 @@ export default function ParentRequestsScreen() {
                       className="rounded-full border border-coral px-4 py-2 items-center justify-center active:opacity-90"
                     >
                       <Text className="text-coral text-sm font-semibold font-rubik">
-                        {t("parent.rejectRequest") || "דחה"}
+                        {t("parent.rejectRequest")}
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : request.status === "approved" ? (
+                  <View className="mt-4">
+                    <Pressable
+                      onPress={() =>
+                        router.push({
+                          pathname: "/(parent)/intro-detail",
+                          params: { requestId: request.id },
+                        })
+                      }
+                      className="bg-teal rounded-full py-2 items-center justify-center active:opacity-90"
+                    >
+                      <Text className="text-white text-sm font-semibold font-rubik">
+                        {t("parent.viewIntroDetails")}
                       </Text>
                     </Pressable>
                   </View>

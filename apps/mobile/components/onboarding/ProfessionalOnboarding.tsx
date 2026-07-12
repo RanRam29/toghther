@@ -10,6 +10,8 @@ import {
   fetchProfile,
   updateBaseProfile,
 } from "@/lib/auth-api";
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import {
   CITY_PRESETS,
   FRAMEWORK_TYPES,
@@ -72,6 +74,8 @@ export function ProfessionalOnboarding() {
         frameworkTypes,
         city: { lng: city.lng, lat: city.lat },
       });
+
+      void track(AnalyticsEvents.PRO_ONBOARDING_COMPLETED, {});
 
       const profile = await fetchProfile(session.user.id);
       setProfile(profile);

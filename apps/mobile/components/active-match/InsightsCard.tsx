@@ -37,18 +37,32 @@ interface DailyLogRowProps {
   dateLabel: string;
   mood: number;
   notes: string;
+  summary?: string | null;
+  noReportLabel?: string;
 }
 
-export function DailyLogRow({ dateLabel, mood, notes }: DailyLogRowProps) {
+export function DailyLogRow({
+  dateLabel,
+  mood,
+  notes,
+  summary,
+  noReportLabel,
+}: DailyLogRowProps) {
   return (
     <View className="bg-surface border border-border rounded-card p-4 mb-3 flex-row items-start gap-3">
       <MoodBadge value={mood} />
       <View className="flex-1">
         <Text className="text-sm font-semibold text-ink font-rubik">{dateLabel}</Text>
-        {notes ? (
+        {summary ? (
+          <Text className="text-sm text-ink-2 mt-1 leading-5" numberOfLines={4}>
+            {summary}
+          </Text>
+        ) : notes ? (
           <Text className="text-sm text-ink-2 mt-1 leading-5" numberOfLines={3}>
             {notes}
           </Text>
+        ) : noReportLabel ? (
+          <Text className="text-sm text-ink-2 mt-1 leading-5">{noReportLabel}</Text>
         ) : null}
       </View>
     </View>

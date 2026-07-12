@@ -30,6 +30,13 @@ BEGIN
   -- SETUP MOCK DATA
   -- ============================================================
 
+  -- Local Postgres does not auto-grant table privileges to `anon`/`authenticated`
+  -- the way Supabase Cloud does (Cloud provisions them at project init). Grant
+  -- them here so this test file is portable across environments. RLS still
+  -- enforces per-row access on top of the grants — that is exactly what we test.
+  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
+  GRANT USAGE ON SCHEMA public TO authenticated;
+
   -- Setup mock auth users
   INSERT INTO auth.users (id, phone, aud, role) VALUES 
     (parent_1_id, '0501234567', 'authenticated', 'authenticated'),
@@ -49,10 +56,14 @@ BEGIN
   -- ============================================================
   -- TEST 5: ANON USER PRIVACY
   -- ============================================================
+  -- Anon has no GRANT on children (blocked before RLS even runs) — strictly stronger
+  -- than "returns empty". Assert on the permission-denied error class.
   EXECUTE 'SET LOCAL role TO anon';
-  RETURN NEXT is_empty(
+  RETURN NEXT throws_ok(
     'SELECT * FROM public.children',
-    'Anon cannot read public children (returns empty)'
+    '42501',
+    NULL,
+    'Anon cannot read public children (permission denied — RLS backed by table GRANT)'
   );
 
   -- ============================================================
@@ -164,9 +175,16 @@ BEGIN
   -- Switch back to parent_1 to approve request
   PERFORM set_config('request.jwt.claims', json_build_object('sub', parent_1_id, 'role', 'authenticated')::text, true);
 
-  -- Parent approves request (returns match_id)
-  SELECT approve_request(request_id) INTO v_match_id;
-  RETURN NEXT ok(v_match_id IS NOT NULL, 'Parent can approve request which returns a valid match_id');
+  -- Parent approves request (TIER 2 only — no match yet)
+  PERFORM approve_request(request_id);
+  RETURN NEXT ok(
+    EXISTS (SELECT 1 FROM match_requests WHERE id = request_id AND status = 'approved' AND tier_reached = 2),
+    'Parent can approve request to TIER 2 without creating a match'
+  );
+
+  -- Parent activates match explicitly (TIER 3)
+  SELECT create_match_from_request(request_id) INTO v_match_id;
+  RETURN NEXT ok(v_match_id IS NOT NULL, 'Parent can activate match from approved request');
 
   -- Switch to professional context (now Tier 3 active match)
   PERFORM set_config('request.jwt.claims', json_build_object('sub', professional_id, 'role', 'authenticated')::text, true);
@@ -190,7 +208,7 @@ BEGIN
   );
 
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, extensions;
 
 -- Run all tests starting with test_
 SELECT * FROM runtests('public'::name, '^test_');

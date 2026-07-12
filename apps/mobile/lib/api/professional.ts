@@ -39,6 +39,19 @@ export async function fetchMyProfessional(
   return data;
 }
 
+export async function fetchProfessionalById(
+  professionalId: string,
+): Promise<Professional | null> {
+  const { data, error } = await supabase
+    .from("professionals")
+    .select("*")
+    .eq("id", professionalId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function updateMyProfessional(
   userId: string,
   input: TablesUpdate<"professionals">,

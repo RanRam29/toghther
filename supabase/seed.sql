@@ -242,7 +242,57 @@ BEGIN
   FROM children c
   WHERE c.first_name IN ('נועם', 'עדן', 'אור', 'Maya', 'תומר');
 
-  RETURN 'Seed data created: 5 parents, 10 children, 15 professionals';
+  -- ========== GENERATE 50 ADDITIONAL PROFESSIONALS FOR COLD-START ==========
+  FOR i IN 1..50 LOOP
+    v_id := gen_random_uuid();
+    -- Insert into auth.users
+    INSERT INTO auth.users (id, phone, phone_confirmed_at, raw_user_meta_data, aud, role)
+    VALUES (v_id, '059' || lpad(i::text, 7, '0'), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
+    
+    -- Update profile
+    UPDATE profiles SET full_name = 'משלבת דמו ' || i, area = 'תל אביב', preferred_language = 'he' WHERE id = v_id;
+    
+    -- Insert into professionals
+    -- We randomly assign specialties and location around Tel Aviv (lat 32.05-32.10, lon 34.75-34.80)
+    INSERT INTO professionals (user_id, display_name, bio, type, specialties, certifications, experience_years, verified, rating_avg, rating_count, backup_available, location, max_radius_km, languages, framework_types, availability)
+    VALUES (
+      v_id, 
+      'משלבת דמו ' || i, 
+      'פרופיל דמו שנוצר אוטומטית לטובת בדיקות עומס והדגמת אלגוריתם בעיר ההשקה.', 
+      'mashlavit', 
+      CASE WHEN i % 3 = 0 THEN '{autism,adhd}'::text[] WHEN i % 2 = 0 THEN '{emotional,learning_disability}'::text[] ELSE '{physical,intellectual}'::text[] END, 
+      '{special_ed_cert}', 
+      (i % 10) + 1, 
+      'verified', 
+      4.0 + (i % 10) * 0.1, 
+      i % 20, 
+      (i % 5 = 0), 
+      ST_SetSRID(ST_MakePoint(34.75 + random() * 0.05, 32.05 + random() * 0.05), 4326), 
+      10 + (i % 5), 
+      '{he}', 
+      '{regular_school,special_ed}', 
+      '{"sunday":[8,14],"monday":[8,14],"tuesday":[8,14],"wednesday":[8,14],"thursday":[8,14]}'
+    );
+  END LOOP;
+
+  -- ========== MOCK MATCHES & DAILY OPS LOGS ==========
+  -- Get the UUID of the first child (נועם)
+  SELECT id INTO v_id FROM children WHERE parent_id = parent_ids[1] LIMIT 1;
+  
+  -- Create an active match with Pro 1
+  INSERT INTO matches (child_id, professional_id, status, hourly_rate, metric_keys)
+  VALUES (v_id, pro_user_ids[1], 'active', 75, '{sensory_regulation,social_interaction,routine_transition}');
+  
+  -- Insert some checkins and daily logs for this match to demonstrate WP5 retention charts
+  -- We assume the match_id is the one we just inserted. Since matches has no explicit UUID returned easily here, we do it via subquery
+  INSERT INTO checkins (match_id, lat, lng, is_valid)
+  SELECT id, 32.08, 34.78, true FROM matches WHERE child_id = v_id AND professional_id = pro_user_ids[1];
+
+  INSERT INTO daily_logs (match_id, log_date, mood, metrics, notes, ai_summary)
+  SELECT id, current_date, 'great', '{"sensory_regulation": 4, "social_interaction": 5, "routine_transition": 4}'::jsonb, 'היה יום מצוין, נועם שיחק יפה עם חברים.', 'נועם חווה יום חיובי עם הצלחות חברתיות משמעותיות וויסות סנסורי טוב.' 
+  FROM matches WHERE child_id = v_id AND professional_id = pro_user_ids[1];
+
+  RETURN 'Seed data created: 5 parents, 10 children, 65 professionals, and mock ops data';
 END;
 $$ LANGUAGE plpgsql;
 

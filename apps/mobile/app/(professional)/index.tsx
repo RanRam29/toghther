@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Pressable,
   RefreshControl,
   ScrollView,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { IncomingRequestCard } from "@/components/professional/Cards";
 import { ActiveMatchBanner } from "@/components/shared/ActiveMatchBanner";
@@ -17,6 +19,7 @@ import {
   useMyProfessional,
   useRespondToRequest,
 } from "@/hooks/useProfessional";
+import { promptPushPermission } from "@/components/shared/PushPermissionProvider";
 import { useAuthStore } from "@/stores/auth-store";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -52,6 +55,11 @@ export default function ProfessionalHomeScreen() {
     respond.mutate(
       { requestId, status },
       {
+        onSuccess: () => {
+          if (status === "interested" && userId) {
+            void promptPushPermission(userId);
+          }
+        },
         onError: (err) => {
           const message =
             err instanceof Error ? err.message : t("common.tryAgain");
@@ -65,6 +73,11 @@ export default function ProfessionalHomeScreen() {
     <ScreenShell
       title={t("professional.homeTitle")}
       subtitle={t("professional.homeSubtitle")}
+      headerRight={
+        <Pressable onPress={() => router.push("/settings")} className="p-2 -mr-2 bg-surface rounded-full border border-border">
+          <Ionicons name="settings-outline" size={24} color="#534AB7" />
+        </Pressable>
+      }
     >
       <ScrollView
         className="flex-1"
@@ -79,12 +92,9 @@ export default function ProfessionalHomeScreen() {
             subtitle={t("activeMatch.bannerSubtitleChild", {
               name: activeMatch.child?.first_name ?? "",
             })}
-            actionLabel={t("activeMatch.bannerAction")}
+            actionLabel={t("professional.todayTitle")}
             onPress={() =>
-              router.push({
-                pathname: "/(active-match)",
-                params: { matchId: activeMatch.id },
-              })
+              router.push({ pathname: "/(professional)/today" } as never)
             }
           />
         ) : null}
@@ -121,7 +131,11 @@ export default function ProfessionalHomeScreen() {
                       : t("professional.nonVerbal")
                     : ""
                 }
-                statusLabel={t(`enums.requestStatus.${request.status}`)}
+                statusLabel={
+                  request.status === "approved"
+                    ? t("professional.waitingForParent")
+                    : t(`enums.requestStatus.${request.status}`)
+                }
                 statusColor={STATUS_COLORS[request.status] ?? "text-ink-2"}
                 parentMessage={request.parent_message}
                 matchReason={request.match_reason}

@@ -9,6 +9,8 @@ import {
   ScreenShell,
 } from "@/components/ui/Screen";
 import { fetchProfile, sendPhoneOtp, verifyPhoneOtp } from "@/lib/auth-api";
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
@@ -47,6 +49,8 @@ export default function VerifyOtpScreen() {
     try {
       const session = await verifyPhoneOtp(pendingPhone, otp);
       setSession(session);
+
+      void track(AnalyticsEvents.SIGNUP_COMPLETED, { role: selectedRole ?? "unknown" });
 
       if (session?.user) {
         const profile = await fetchProfile(session.user.id);

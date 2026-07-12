@@ -1,4 +1,5 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import type { Child } from "@/lib/types";
 
@@ -98,7 +99,10 @@ export function MatchCard({
           {bio}
         </Text>
       ) : null}
-      <Text className="text-xs text-teal font-medium mb-2">{matchReason}</Text>
+      <View className="flex-row items-start gap-1 bg-teal/10 rounded-lg p-2 mb-3">
+        <Ionicons name="sparkles" size={14} color="#0F6E56" className="mt-0.5" />
+        <Text className="text-xs text-teal font-medium flex-1 leading-5">{matchReason}</Text>
+      </View>
       <View className="flex-row gap-4">
         <Text className="text-xs text-ink-2">{distanceLabel}</Text>
         {ratingAvg > 0 ? (

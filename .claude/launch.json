@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-dist-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/static-serve.js"],
+      "port": 4176
+    }
+  ]
+}

@@ -9,31 +9,49 @@ import {
   View,
 } from "react-native";
 
+import { DocumentChecklist } from "@/components/professional/DocumentChecklist";
 import { PrimaryButton, ScreenShell } from "@/components/ui/Screen";
 import type { DocumentType } from "@/lib/api/documents";
 import { pickDocumentOrImage, uploadPickedDocument } from "@/lib/uploads";
+import {
+  buildDocumentChecklist,
+  hasAllRequiredDocuments,
+  OPTIONAL_DOC_TYPES,
+  verificationProgress,
+} from "@/lib/verification";
 import { useDeleteDocument, useDocuments } from "@/hooks/useDocuments";
+import { useSubmitForVerification } from "@/hooks/useVerification";
+import { useMyProfessional } from "@/hooks/useProfessional";
 import { useAuthStore } from "@/stores/auth-store";
-
-const DOC_TYPES: DocumentType[] = [
-  "certificate",
-  "criminal_record",
-  "id_card",
-  "degree",
-  "other",
-];
 
 export default function ProfessionalDocumentsScreen() {
   const { t } = useTranslation();
   const session = useAuthStore((s) => s.session);
   const userId = session?.user?.id;
 
+  const { data: professional } = useMyProfessional(userId);
   const { data: documents = [], isLoading, refetch } = useDocuments(userId);
   const del = useDeleteDocument(userId);
+  const submitReview = useSubmitForVerification(userId);
+
   const [uploadingType, setUploadingType] = useState<DocumentType | null>(null);
+
+  const checklist = buildDocumentChecklist(documents);
+  const progress = verificationProgress(documents);
+  const allRequired = hasAllRequiredDocuments(documents);
+  const verificationStatus = professional?.verified ?? "pending";
 
   async function handleUpload(docType: DocumentType) {
     if (!userId) return;
+
+    const existing = documents.find((d) => d.doc_type === docType);
+    if (existing) {
+      try {
+        await del.mutateAsync({ id: existing.id, storagePath: existing.storage_path });
+      } catch {
+        // continue — replacement upload may still work
+      }
+    }
 
     try {
       const file = await pickDocumentOrImage();
@@ -41,44 +59,32 @@ export default function ProfessionalDocumentsScreen() {
 
       setUploadingType(docType);
       await uploadPickedDocument(userId, docType, file);
-      await refetch();
+      const refreshed = await refetch();
+      const docs = refreshed.data ?? [];
+
+      if (
+        hasAllRequiredDocuments(docs) &&
+        (verificationStatus === "pending" || verificationStatus === "rejected")
+      ) {
+        try {
+          await submitReview.mutateAsync(docs);
+        } catch {
+          // submitted status may fail if already submitted — non-fatal
+        }
+      }
+
       Alert.alert(t("professional.uploadSuccess"));
     } catch (err) {
       const raw = err instanceof Error ? err.message : String(err);
-      const message =
-        raw === "FILE_TOO_LARGE"
-          ? t("professional.uploadTooLarge")
-          : raw;
+      const message = raw === "FILE_TOO_LARGE" ? t("professional.uploadTooLarge") : raw;
       Alert.alert(t("common.error"), message);
     } finally {
       setUploadingType(null);
     }
   }
 
-  function handleDelete(id: string, storagePath: string) {
-    Alert.alert(
-      t("professional.deleteDocumentTitle"),
-      t("professional.deleteDocumentConfirm"),
-      [
-        { text: t("common.tryAgain"), style: "cancel" },
-        {
-          text: t("professional.deleteDocumentAction"),
-          style: "destructive",
-          onPress: () => {
-            del.mutate(
-              { id, storagePath },
-              {
-                onError: (err) => {
-                  const message =
-                    err instanceof Error ? err.message : t("common.tryAgain");
-                  Alert.alert(t("common.error"), message);
-                },
-              },
-            );
-          },
-        },
-      ],
-    );
+  function getStatusLabel(status: (typeof checklist)[number]["status"]) {
+    return t(`professional.docChecklist.${status}`);
   }
 
   return (
@@ -88,91 +94,85 @@ export default function ProfessionalDocumentsScreen() {
       subtitle={t("professional.documentsSubtitle")}
     >
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="mb-6">
-          <Text className="text-sm font-bold text-purple mb-3 font-rubik">
-            {t("professional.uploadNewDocument")}
+        <View className="bg-purple-bg border border-purple rounded-card p-4 mb-6">
+          <Text className="text-sm font-bold text-purple-ink mb-2 font-rubik text-right">
+            {t("professional.documentsProgress", { percent: progress })}
           </Text>
-          {DOC_TYPES.map((docType) => {
-            const uploading = uploadingType === docType;
-            return (
-              <Pressable
-                key={docType}
-                onPress={() => handleUpload(docType)}
-                disabled={uploading || uploadingType !== null}
-                className={`bg-surface border border-border rounded-card px-4 py-4 mb-2 flex-row items-center justify-between active:opacity-90 ${
-                  uploadingType !== null && !uploading ? "opacity-50" : ""
-                }`}
-              >
-                <Text className="text-base font-medium text-ink">
-                  {t(`professional.docTypes.${docType}`)}
-                </Text>
-                {uploading ? (
-                  <ActivityIndicator size="small" color="#534AB7" />
-                ) : (
-                  <Text className="text-purple text-sm font-semibold font-rubik">
-                    + {t("professional.uploadNow")}
-                  </Text>
-                )}
-              </Pressable>
-            );
-          })}
+          <View className="h-2 bg-surface rounded-full overflow-hidden">
+            <View
+              className="h-full bg-purple rounded-full"
+              style={{ width: `${progress}%` }}
+            />
+          </View>
+          {allRequired && verificationStatus === "submitted" ? (
+            <Text className="text-sm text-teal mt-3 text-right leading-5">
+              {t("professional.documentsSubmitted")}
+            </Text>
+          ) : allRequired ? (
+            <Text className="text-sm text-ink-2 mt-3 text-right leading-5">
+              {t("professional.documentsReadySubmit")}
+            </Text>
+          ) : (
+            <Text className="text-sm text-ink-2 mt-3 text-right leading-5">
+              {t("professional.documentsRequiredHint")}
+            </Text>
+          )}
         </View>
 
-        <Text className="text-sm font-bold text-purple mb-3 font-rubik">
-          {t("professional.myDocuments")}
+        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-right">
+          {t("professional.documentsRequiredTitle")}
         </Text>
 
         {isLoading ? (
-          <ActivityIndicator size="large" color="#0F6E56" className="mt-4" />
-        ) : documents.length === 0 ? (
-          <View className="bg-surface border border-border rounded-card p-5">
-            <Text className="text-ink-2 text-center leading-6">
-              {t("professional.noDocuments")}
-            </Text>
-          </View>
+          <ActivityIndicator size="large" color="#0F6E56" className="mb-6" />
         ) : (
-          documents.map((doc) => (
-            <View
-              key={doc.id}
-              className="bg-surface border border-border rounded-card p-4 mb-3"
-            >
-              <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-base font-bold text-ink font-rubik">
-                  {t(`professional.docTypes.${doc.doc_type}`)}
-                </Text>
-                <Text
-                  className={`text-sm font-semibold ${
-                    doc.verified ? "text-teal" : "text-amber"
-                  }`}
-                >
-                  {doc.verified
-                    ? t("professional.docVerified")
-                    : t("professional.docPending")}
-                </Text>
-              </View>
-              {doc.file_name ? (
-                <Text className="text-sm text-ink-2 mb-3">{doc.file_name}</Text>
-              ) : null}
-              {doc.rejection_note ? (
-                <Text className="text-sm text-coral leading-5 mb-3">
-                  {doc.rejection_note}
-                </Text>
-              ) : null}
-              <Pressable
-                onPress={() => handleDelete(doc.id, doc.storage_path)}
-                className="self-start rounded-full px-4 py-2 border border-coral active:opacity-90"
-              >
-                <Text className="text-coral text-sm font-semibold font-rubik">
-                  {t("professional.deleteDocumentAction")}
-                </Text>
-              </Pressable>
-            </View>
-          ))
+          <DocumentChecklist
+            items={checklist}
+            getLabel={(type) => t(`professional.docTypes.${type}`)}
+            getStatusLabel={getStatusLabel}
+            getUploadLabel={(status, uploading) =>
+              uploading
+                ? t("common.loading")
+                : status === "rejected"
+                  ? t("professional.uploadReupload")
+                  : t("professional.uploadAdd")
+            }
+            onUpload={(type) => handleUpload(type as DocumentType)}
+            uploadingType={uploadingType}
+          />
         )}
+
+        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-right">
+          {t("professional.documentsOptionalTitle")}
+        </Text>
+        {OPTIONAL_DOC_TYPES.map((docType) => {
+          const existing = documents.find((d) => d.doc_type === docType);
+          const uploading = uploadingType === docType;
+          return (
+            <Pressable
+              key={docType}
+              onPress={() => handleUpload(docType)}
+              disabled={uploading || uploadingType !== null}
+              className="bg-surface border border-border rounded-card px-4 py-4 mb-2 flex-row items-center justify-between active:opacity-90"
+            >
+              <Text className="text-base font-medium text-ink">
+                {existing ? "✓ " : ""}
+                {t(`professional.docTypes.${docType}`)}
+              </Text>
+              {uploading ? (
+                <ActivityIndicator size="small" color="#534AB7" />
+              ) : (
+                <Text className="text-purple text-sm font-semibold font-rubik">
+                  + {t("professional.uploadNow")}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
 
         <View className="pb-10 mt-4">
           <PrimaryButton
-            label={t("common.tryAgain")}
+            label={t("professional.documentsRefresh")}
             onPress={() => refetch()}
             variant="teal"
           />

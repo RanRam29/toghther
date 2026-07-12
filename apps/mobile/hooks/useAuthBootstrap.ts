@@ -19,6 +19,10 @@ export function useAuthBootstrap() {
         try {
           const profile = await fetchProfile(session.user.id);
           if (mounted) setProfile(profile);
+          // Register token silently if permissions were already granted
+          import("@/lib/push-notifications").then((m) =>
+            m.registerForPushNotificationsAsync(session.user.id, true)
+          ).catch(e => console.warn("Push token silent reg err:", e));
         } catch (error) {
           console.warn("[auth] profile fetch failed:", error);
           if (mounted) setProfile(null);

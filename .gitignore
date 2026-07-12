@@ -34,3 +34,6 @@ supabase/functions/.env
 *.swp
 
 .vercel
+
+# Supabase local branch state
+supabase/.branches/

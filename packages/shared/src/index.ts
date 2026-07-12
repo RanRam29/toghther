@@ -24,5 +24,5 @@ export type Checkin = Tables<"checkins">;
 export type DailyLog = Tables<"daily_logs">;
 export type Review = Tables<"reviews">;
 
-export type UserRole = "parent" | "professional" | "admin";
+export type UserRole = "parent" | "professional" | "admin" | "supervisor";
 export type AppLanguage = "he" | "en";

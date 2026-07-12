@@ -1,16 +1,16 @@
 {
-  "last_updated": "2026-07-07T20:30:00Z",
+  "last_updated": "2026-07-12T07:15:00Z",
   "project_id": "flrflktlltmqbiamljlm",
   "agents": {
     "antigravity": {
-      "status": "completed_c4_backend",
-      "current_task": "C4 migration + pgTAP tests authored. Cloud deploy blocked from Cursor env — run scripts/deploy-c4-cloud.ps1 from network-enabled machine.",
+      "status": "deployed_verified",
+      "current_task": "All migrations deployed to cloud. pgTAP 35/35 PASS locally.",
       "blocked_by": null
     },
     "cursor": {
-      "status": "completed_c4_verification",
-      "current_task": "C4 verified end-to-end locally: db reset (12 migrations), test db PASS (7/7 C4 + RLS), types regen with cloud fallback, tsc clean. Scripts: verify-c4.ps1 + deploy-c4-cloud.ps1.",
-      "blocked_by": "supabase_cloud_network_from_cursor_env"
+      "status": "mvp_complete",
+      "current_task": "Cloud synced, types regenerated, tsc clean, mobile .env configured. Pending: admin MFA enrollment in production, CLAUDE_API_KEY, manual E2E on device.",
+      "blocked_by": null
     }
   },
   "tasks": {
@@ -22,7 +22,7 @@
     "security_overhaul": "completed",
     "c4_role_escalation": "completed",
     "c4_role_escalation_local_verified": "completed",
-    "c4_role_escalation_cloud_push": "pending_run_deploy_c4_cloud_script",
+    "c4_role_escalation_cloud_push": "completed",
     "expo_setup": "completed",
     "nativewind_setup": "completed",
     "expo_router": "completed",
@@ -45,11 +45,38 @@
     "active_match_dashboard": "completed",
     "active_match_navigation": "completed",
     "daily_log_form": "completed",
-    "reviews_submit": "completed",
+    "reviews_submit": "completed_rpc_only",
     "reviews_view": "completed",
-    "end_match_flow": "completed",
+    "end_match_flow": "completed_rpc",
     "edge_function_calculate_matches": "wired",
     "eas_build_config": "completed",
-    "build_documentation": "completed"
-  }
+    "build_documentation": "completed",
+    "test_data_full_seed": "authored_scripts_seed-test-data.sql",
+    "wp1_split_approve_from_match": "completed",
+    "wp2_push_foundation": "completed",
+    "wp3_admin_verification_backend": "completed",
+    "wp3_supervisor_role": "completed",
+    "wp4_engine_cleanup": "completed",
+    "wp5_daily_ops": "completed",
+    "wp6_admin_analytics": "completed",
+    "wp7_launch_prep": "completed_code",
+    "blocker_fixes_migration": "completed",
+    "staff_admin_web_ui": "completed",
+    "analytics_events_wired": "completed",
+    "push_trigger_schema_fixes": "completed",
+    "secondary_parent_d31": "completed",
+    "pgtap_local_suite": "completed_35_of_35",
+    "mobile_env_configured": "completed"
+  },
+  "deploy_scripts": [
+    "scripts/deploy-c4-cloud.ps1",
+    "scripts/deploy-pending-migrations.ps1",
+    "scripts/verify-c4.ps1"
+  ],
+  "manual_next_steps": [
+    "Enroll admin TOTP MFA in Supabase production dashboard",
+    "Set CLAUDE_API_KEY in Supabase Edge Function secrets",
+    "Manual E2E per docs/TESTING-STRATEGY.md section 4 on real devices",
+    "Legal review + beta supply recruitment (non-code)"
+  ]
 }

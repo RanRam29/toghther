@@ -67,13 +67,30 @@ export async function createMatchRequest(
   return data;
 }
 
-export async function approveMatchRequest(requestId: string): Promise<string> {
-  const { data, error } = await supabase.rpc("approve_request", {
+export async function approveMatchRequest(requestId: string): Promise<void> {
+  const { error } = await supabase.rpc("approve_request", {
+    p_request_id: requestId,
+  });
+
+  if (error) throw error;
+}
+
+export async function createMatchFromRequest(requestId: string): Promise<string> {
+  const { data, error } = await supabase.rpc("create_match_from_request", {
     p_request_id: requestId,
   });
 
   if (error) throw error;
   return data as string; // match_id
+}
+
+export async function declineAfterIntro(requestId: string, reason?: string): Promise<void> {
+  const { error } = await supabase.rpc("decline_after_intro", {
+    p_request_id: requestId,
+    p_reason: reason,
+  });
+
+  if (error) throw error;
 }
 
 export async function rejectMatchRequest(requestId: string): Promise<void> {

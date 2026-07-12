@@ -2,7 +2,7 @@ import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": Deno.env.get("CORS_ORIGIN") || "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
@@ -72,70 +72,12 @@ export default {
       const childName = (matchDetails as any).child?.first_name || "הילד";
       const proName = (matchDetails as any).professional?.display_name || "המשלבת";
 
-      // Get Claude API Key
-      const claudeApiKey = Deno.env.get("CLAUDE_API_KEY");
-      let aiSummary = "";
-      let aiStrategy = "";
-
-      if (claudeApiKey) {
-        try {
-          const prompt = `את/ה עוזר/ת פדגוגי/ת מבוסס בינה מלאכותית בפלטפורמת Together. תפקידך הוא לעבד דיווח יומי שנכתב על ידי המשלבת ולייצר שני סיכומים בעברית:
-1. סיכום יום להורה (ai_summary): 2-3 משפטים חמים, מרגיעים, מעודדים וברורים (בלי ז'רגון מקצועי מדי).
-2. אסטרטגיה למחר למשלבת (ai_strategy): 1-2 משפטים פרקטיים המציעים עצה או דגש לעבודה מחר על בסיס הדיווח של היום.
-
-פרטי הדיווח:
-- שם הילד: ${childName}
-- שם המשלבת: ${proName}
-- תאריך הדיווח: ${record.log_date}
-- מצב רוח כללי (סולם 1-5, כאשר 1 קשה ו-5 מצוין): ${record.mood}/5
-- מדדים כמותיים (metrics): ${JSON.stringify(record.metrics)}
-- הערות חופשיות של המשלבת (notes): ${record.notes || "לא נרשמו הערות נוספות"}
-
-החזר את התשובה כקובץ JSON תקין בלבד (ללא הקדמות או סיומות) במבנה הבא:
-{
-  "ai_summary": "הסבר חם ומעודד להורה כאן...",
-  "ai_strategy": "הצעה אסטרטגית למשלבת כאן..."
-}`;
-
-          const response = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: {
-              "x-api-key": claudeApiKey,
-              "anthropic-version": "2023-06-01",
-              "content-type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "claude-3-5-sonnet-latest",
-              max_tokens: 512,
-              messages: [{ role: "user", content: prompt }],
-            }),
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            const contentText = result.content?.[0]?.text;
-            if (contentText) {
-              const cleanJson = contentText.trim().replace(/^```json/, "").replace(/```$/, "").trim();
-              const parsed = JSON.parse(cleanJson);
-              aiSummary = parsed.ai_summary || "";
-              aiStrategy = parsed.ai_strategy || "";
-            }
-          } else {
-            console.error("Claude API responded with error:", await response.text());
-          }
-        } catch (aiErr) {
-          console.error("AI summarization failed:", aiErr);
-        }
-      }
-
-      // Fallback: If AI fails or API key is not configured, generate a baseline summary
-      if (!aiSummary) {
-        const moodText = record.mood >= 4 ? "חיובי מאוד" : record.mood === 3 ? "טוב" : "מאתגר";
-        aiSummary = `התקבל דיווח יומי מאת המשלבת ${proName} עבור ${childName}. מצב הרוח הכללי היום היה ${moodText}.`;
-      }
-      if (!aiStrategy) {
-        aiStrategy = "מומלץ להמשיך לעקוב אחר המדדים היומיים ולשמור על עקביות בשיטות השילוב.";
-      }
+      // Deterministic generation (AI removed per D30)
+      const moodText = record.mood >= 4 ? "חיובי וטוב" : record.mood === 3 ? "סביר" : "מלווה באתגרים";
+      const aiSummary = `התקבל דיווח יומי מאת המשלבת ${proName} עבור ${childName}. היום עבר באופן ${moodText}.`;
+      const aiStrategy = record.mood < 3
+        ? "היום היה מעט מאתגר. מומלץ לבדוק את ההערות ולשקול התאמות למחר."
+        : "היום עבר בצורה טובה. כדאי להמשיך בשיטות הנוכחיות ולעקוב אחרי ההתקדמות.";
 
       // Update the daily log record in the database using admin client (bypasses RLS since this is a system cron/webhook)
       const { error: updateError } = await ctx.supabaseAdmin

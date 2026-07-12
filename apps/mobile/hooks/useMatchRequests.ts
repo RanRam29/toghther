@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import {
   approveMatchRequest,
   createMatchRequest,
+  declineAfterIntro,
   fetchMatchRequestsForParent,
   rejectMatchRequest,
 } from "@/lib/api/matches";
@@ -23,7 +26,11 @@ export function useCreateMatchRequest(parentId: string | undefined) {
 
   return useMutation({
     mutationFn: createMatchRequest,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      void track(AnalyticsEvents.REQUEST_SENT, {
+        request_id: data.id,
+        initiated_by: data.initiated_by ?? "parent",
+      });
       if (parentId) {
         queryClient.invalidateQueries({
           queryKey: matchRequestsQueryKey(parentId),
@@ -38,14 +45,27 @@ export function useApproveMatchRequest(parentId: string | undefined) {
 
   return useMutation({
     mutationFn: approveMatchRequest,
-    onSuccess: () => {
+    onSuccess: (_data, requestId) => {
+      void track(AnalyticsEvents.REQUEST_APPROVED, { request_id: requestId });
       if (parentId) {
         queryClient.invalidateQueries({
           queryKey: matchRequestsQueryKey(parentId),
         });
-        // Invalidate active matches query key to update active match screens
+      }
+    },
+  });
+}
+
+export function useDeclineAfterIntro(parentId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ requestId, reason }: { requestId: string; reason?: string }) =>
+      declineAfterIntro(requestId, reason),
+    onSuccess: () => {
+      if (parentId) {
         queryClient.invalidateQueries({
-          queryKey: ["matches", parentId],
+          queryKey: matchRequestsQueryKey(parentId),
         });
       }
     },

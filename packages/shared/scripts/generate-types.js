@@ -6,10 +6,11 @@ const targetPath = path.join(__dirname, "../src/types/database.ts");
 
 function generate(command, label) {
   console.log(`Generating types from ${label}...`);
-  return execSync(command, {
+  const result = execSync(command, {
     maxBuffer: 10 * 1024 * 1024,
-    stdio: ["ignore", "pipe", "ignore"],
+    stdio: ["ignore", "pipe", "pipe"],
   });
+  return result;
 }
 
 function writeTypes(output) {
@@ -17,6 +18,7 @@ function writeTypes(output) {
     .toString()
     .split(/\r?\n/)
     .filter((line) => !line.startsWith('{"_tag":"Error"'))
+    .filter((line) => !line.startsWith("npm warn"))
     .join("\n")
     .trim();
   if (!text || text.length < 100 || !text.includes("export type Database")) {

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
 import { createChild, fetchChildren, updateChild } from "@/lib/api/children";
 import type { Child } from "@/lib/types";
 import { useParentStore } from "@/stores/parent-store";
@@ -41,6 +43,9 @@ export function useCreateChild(parentId: string | undefined) {
       return createChild(input);
     },
     onSuccess: (child) => {
+      if (child.published) {
+        void track(AnalyticsEvents.CHILD_PUBLISHED, { child_id: child.id });
+      }
       if (parentId) {
         queryClient.invalidateQueries({ queryKey: childrenQueryKey(parentId) });
       }
@@ -55,7 +60,10 @@ export function useUpdateChild(parentId: string | undefined) {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Parameters<typeof updateChild>[1] }) =>
       updateChild(id, input),
-    onSuccess: () => {
+    onSuccess: (child, vars) => {
+      if (vars.input.published) {
+        void track(AnalyticsEvents.CHILD_PUBLISHED, { child_id: child.id });
+      }
       if (parentId) {
         queryClient.invalidateQueries({ queryKey: childrenQueryKey(parentId) });
       }

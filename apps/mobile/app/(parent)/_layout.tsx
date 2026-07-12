@@ -6,11 +6,19 @@ export default function ParentLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="match-detail"
-        options={{ presentation: "card", animation: "slide_from_end" }}
+        options={{ presentation: "card", animation: "slide_from_left" }}
       />
       <Stack.Screen
         name="child-details"
-        options={{ presentation: "card", animation: "slide_from_end" }}
+        options={{ presentation: "card", animation: "slide_from_left" }}
+      />
+      <Stack.Screen
+        name="intro-detail"
+        options={{ presentation: "card", animation: "slide_from_left" }}
+      />
+      <Stack.Screen
+        name="match-permissions"
+        options={{ presentation: "card", animation: "slide_from_left" }}
       />
     </Stack>
   );

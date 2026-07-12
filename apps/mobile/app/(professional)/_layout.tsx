@@ -1,8 +1,11 @@
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-export default function ProfessionalLayout() {
+import { useVerificationGate } from "@/hooks/useVerificationGate";
+
+function ProfessionalTabs() {
   const { t } = useTranslation();
+  useVerificationGate();
 
   return (
     <Tabs
@@ -14,9 +17,16 @@ export default function ProfessionalLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: t("professional.homeTitle") }} />
+      <Tabs.Screen name="today" options={{ title: t("professional.todayTitle") }} />
       <Tabs.Screen name="profile" options={{ title: t("professional.profile") }} />
       <Tabs.Screen name="browse" options={{ title: t("professional.browse") }} />
       <Tabs.Screen name="documents" options={{ title: t("professional.documents") }} />
+      <Tabs.Screen
+        name="pending"
+        options={{ href: null, title: t("professional.pendingTitle") }}
+      />
     </Tabs>
   );
 }
+
+export default ProfessionalTabs;

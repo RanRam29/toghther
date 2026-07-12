@@ -134,6 +134,7 @@ interface ScreenShellProps {
   eyebrow?: string;
   children?: React.ReactNode;
   footer?: React.ReactNode;
+  headerRight?: React.ReactNode;
 }
 
 export function ScreenShell({
@@ -142,15 +143,21 @@ export function ScreenShell({
   eyebrow,
   children,
   footer,
+  headerRight,
 }: ScreenShellProps) {
   return (
     <View className="flex-1 bg-bg px-6 pt-16">
-      {eyebrow ? (
-        <Text className="text-xs font-bold text-purple uppercase tracking-widest mb-3 font-rubik">
-          {eyebrow}
-        </Text>
-      ) : null}
-      <Text className="text-3xl font-bold text-ink mb-2 font-rubik">{title}</Text>
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1">
+          {eyebrow ? (
+            <Text className="text-xs font-bold text-purple uppercase tracking-widest mb-3 font-rubik">
+              {eyebrow}
+            </Text>
+          ) : null}
+          <Text className="text-3xl font-bold text-ink mb-2 font-rubik">{title}</Text>
+        </View>
+        {headerRight && <View className="mt-2 ml-4">{headerRight}</View>}
+      </View>
       {subtitle ? (
         <Text className="text-base text-ink-2 mb-8 leading-6">{subtitle}</Text>
       ) : null}

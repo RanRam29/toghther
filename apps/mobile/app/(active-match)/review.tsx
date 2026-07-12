@@ -5,13 +5,14 @@ import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 
 import { StarRating } from "@/components/shared/StarRating";
 import { PrimaryButton, ScreenShell, TextField } from "@/components/ui/Screen";
-import { useSubmitReview } from "@/hooks/useReviews";
+import { useMatchReviewStatus, useSubmitReview } from "@/hooks/useReviews";
 import { useAuthStore } from "@/stores/auth-store";
 
 export default function ReviewScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const profile = useAuthStore((s) => s.profile);
+  const session = useAuthStore((s) => s.session);
+  const userId = session?.user?.id;
   const params = useLocalSearchParams<{
     matchId?: string;
     professionalId?: string;
@@ -26,6 +27,7 @@ export default function ReviewScreen() {
   const [text, setText] = useState("");
 
   const submit = useSubmitReview(professionalId);
+  const reviewStatus = useMatchReviewStatus(matchId, userId);
 
   async function handleSubmit() {
     if (!matchId) {
@@ -33,24 +35,35 @@ export default function ReviewScreen() {
       return;
     }
 
-    const reviewerRole = profile?.role === "professional" ? "professional" : "parent";
-
     try {
       await submit.submitReview({
         matchId,
-        reviewerRole,
         reliability,
         professionalism,
         child_fit: childFit,
         text: text.trim() || undefined,
       });
-      Alert.alert(t("reviews.saved"), undefined, [
+      Alert.alert(t("reviews.saved"), t("reviews.blindHidden"), [
         { text: t("common.continue"), onPress: () => router.back() },
       ]);
     } catch (err) {
       const message = err instanceof Error ? err.message : t("common.tryAgain");
       Alert.alert(t("common.error"), message);
     }
+  }
+
+  if (reviewStatus.data?.hasSubmitted) {
+    return (
+      <ScreenShell title={t("reviews.title")} subtitle={t("reviews.subtitle")}>
+        <View className="bg-surface border border-border rounded-card p-5">
+          <Text className="text-ink text-center leading-6">
+            {reviewStatus.data.isBlind
+              ? t("reviews.blindHidden")
+              : t("reviews.alreadySubmitted")}
+          </Text>
+        </View>
+      </ScreenShell>
+    );
   }
 
   return (
@@ -64,6 +77,12 @@ export default function ReviewScreen() {
       </Pressable>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="bg-amber-bg border border-amber rounded-card p-4 mb-4">
+          <Text className="text-sm text-ink-2 leading-5 text-right">
+            {t("reviews.blindNotice")}
+          </Text>
+        </View>
+
         <StarRating
           label={t("reviews.reliability")}
           value={reliability}

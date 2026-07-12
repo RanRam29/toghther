@@ -34,6 +34,12 @@ entrypoint = "./functions/calculate-matches/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/calculate-matches/*.html" ]
 
+[functions.send-push]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-push/deno.json"
+entrypoint = "./functions/send-push/index.ts"
+
 [functions.process-daily-log]
 enabled = true
 verify_jwt = false

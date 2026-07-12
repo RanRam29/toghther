@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
@@ -6,6 +6,9 @@ import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { ReviewsList, ReviewsSummary } from "@/components/shared/ReviewsList";
 import { PrimaryButton, ScreenShell, TextField } from "@/components/ui/Screen";
 import { useCreateMatchRequest } from "@/hooks/useMatchRequests";
+import { AnalyticsEvents } from "@/lib/analytics/events";
+import { track } from "@/lib/analytics/track";
+import { promptPushPermission } from "@/components/shared/PushPermissionProvider";
 import { useAuthStore } from "@/stores/auth-store";
 
 export default function MatchDetailScreen() {
@@ -26,6 +29,14 @@ export default function MatchDetailScreen() {
   const [message, setMessage] = useState("");
   const createRequest = useCreateMatchRequest(parentId);
 
+  useEffect(() => {
+    if (params.professionalId) {
+      void track(AnalyticsEvents.MATCH_PROFILE_VIEWED, {
+        professional_id: params.professionalId,
+      });
+    }
+  }, [params.professionalId]);
+
   async function handleSendRequest() {
     if (!params.childId || !params.professionalId) return;
 
@@ -42,6 +53,10 @@ export default function MatchDetailScreen() {
         score: params.score ? Number(params.score) : undefined,
         match_reason: params.matchReason,
       });
+
+      if (parentId) {
+        void promptPushPermission(parentId);
+      }
 
       Alert.alert(t("parent.requestSent"), t("parent.requestSentDesc"), [
         {

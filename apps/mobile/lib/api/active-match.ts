@@ -47,36 +47,51 @@ export async function fetchActiveMatchForProfessional(
   return data as unknown as ActiveMatch | null;
 }
 
-/**
- * Approve a match request and atomically create the active match.
- * Uses the secure `approve_request` RPC (state-machine + audit).
- */
-export async function approveAndCreateMatch(
-  requestId: string,
-): Promise<string> {
-  const { data, error } = await supabase.rpc("approve_request", {
-    p_request_id: requestId,
-  });
 
+export async function pauseMatch(matchId: string): Promise<Match> {
+  const { error } = await supabase.rpc("pause_match", { p_match_id: matchId });
   if (error) throw error;
-  return data as string; // match_id
+
+  const { data, error: fetchError } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
+
+  if (fetchError) throw fetchError;
+  return data;
+}
+
+export async function resumeMatch(matchId: string): Promise<Match> {
+  const { error } = await supabase.rpc("resume_match", { p_match_id: matchId });
+  if (error) throw error;
+
+  const { data, error: fetchError } = await supabase
+    .from("matches")
+    .select("*")
+    .eq("id", matchId)
+    .single();
+
+  if (fetchError) throw fetchError;
+  return data;
 }
 
 export async function endMatch(
   matchId: string,
   reason?: string,
 ): Promise<Match> {
-  const { data, error } = await supabase
+  const { error } = await supabase.rpc("end_match", {
+    p_match_id: matchId,
+    ...(reason ? { p_reason: reason } : {}),
+  });
+  if (error) throw error;
+
+  const { data, error: fetchError } = await supabase
     .from("matches")
-    .update({
-      status: "ended",
-      ended_at: new Date().toISOString(),
-      end_reason: reason ?? null,
-    })
-    .eq("id", matchId)
     .select("*")
+    .eq("id", matchId)
     .single();
 
-  if (error) throw error;
+  if (fetchError) throw fetchError;
   return data;
 }
