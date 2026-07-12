@@ -235,6 +235,7 @@
     "otpRequired": "Enter a 6-digit code",
     "supabaseMissing": "Supabase credentials missing. Add a .env file",
     "authFailed": "Sign-in failed. Please try again.",
+    "otpSendFailed": "We couldn't send an SMS code right now. Please try again later.",
     "pro": {
       "eyebrow": "Professional profile",
       "title": "Let's build your profile",

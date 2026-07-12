@@ -4,6 +4,23 @@ import { toGeoPoint } from "@/lib/geo";
 import type { FrameworkType, NeedCategory } from "@/lib/constants/child";
 import type { AppLanguage, Profile, UserRole } from "@/lib/types";
 
+function mapAuthError(error: unknown): string {
+  if (!(error instanceof Error)) return "auth.authFailed";
+
+  const message = error.message.toLowerCase();
+  if (
+    message.includes("sms") ||
+    message.includes("otp") ||
+    message.includes("hook") ||
+    message.includes("twilio") ||
+    message.includes("500")
+  ) {
+    return "auth.otpSendFailed";
+  }
+
+  return error.message || "auth.authFailed";
+}
+
 export async function sendPhoneOtp(phone: string, role: UserRole) {
   if (!isSupabaseConfigured) {
     throw new Error("Supabase is not configured. Add credentials to .env");
@@ -21,7 +38,10 @@ export async function sendPhoneOtp(phone: string, role: UserRole) {
     },
   });
 
-  if (error) throw error;
+  if (error) {
+    const mapped = mapAuthError(error);
+    throw new Error(mapped.startsWith("auth.") ? mapped : error.message);
+  }
   return e164;
 }
 

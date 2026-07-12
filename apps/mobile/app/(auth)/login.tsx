@@ -93,7 +93,8 @@ export default function LoginScreen() {
         }
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : t("auth.authFailed");
+      const raw = err instanceof Error ? err.message : t("auth.authFailed");
+      const message = raw.startsWith("auth.") ? t(raw) : raw;
       Alert.alert(t("common.error"), message);
     } finally {
       setLoading(false);

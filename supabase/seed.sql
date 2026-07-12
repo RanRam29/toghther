@@ -31,8 +31,7 @@
 -- This function creates test data for development
 -- Call it once: SELECT seed_test_data();
 
-CREATE OR REPLACE FUNCTION seed_test_data()
-RETURNS TEXT AS $$
+DO $$
 DECLARE
   -- Parent IDs (will be created dynamically)
   parent_ids UUID[] := ARRAY[
@@ -246,8 +245,8 @@ BEGIN
   FOR i IN 1..50 LOOP
     v_id := gen_random_uuid();
     -- Insert into auth.users
-    INSERT INTO auth.users (id, phone, encrypted_password, phone_confirmed_at, raw_user_meta_data, aud, role)
-    VALUES (v_id, '059' || lpad(i::text, 7, '0'), crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
+    INSERT INTO auth.users (id, email, phone, encrypted_password, phone_confirmed_at, raw_user_meta_data, aud, role)
+    VALUES (v_id, 'pro_extra' || i || '@together.local', '059' || lpad(i::text, 7, '0'), crypt('password123', gen_salt('bf')), now(), '{"role": "professional"}', 'authenticated', 'authenticated');
     
     -- Update profile
     UPDATE profiles SET full_name = 'משלבת דמו ' || i, area = 'תל אביב', preferred_language = 'he' WHERE id = v_id;
@@ -260,7 +259,7 @@ BEGIN
       'משלבת דמו ' || i, 
       'פרופיל דמו שנוצר אוטומטית לטובת בדיקות עומס והדגמת אלגוריתם בעיר ההשקה.', 
       'mashlavit', 
-      CASE WHEN i % 3 = 0 THEN '{autism,adhd}'::text[] WHEN i % 2 = 0 THEN '{emotional,learning_disability}'::text[] ELSE '{physical,intellectual}'::text[] END, 
+      CASE WHEN i % 3 = 0 THEN '{autism,adhd}'::need_category[] WHEN i % 2 = 0 THEN '{emotional,learning_disability}'::need_category[] ELSE '{physical,intellectual}'::need_category[] END, 
       '{special_ed_cert}', 
       (i % 10) + 1, 
       'verified', 
@@ -279,22 +278,25 @@ BEGIN
   -- Get the UUID of the first child (נועם)
   SELECT id INTO v_id FROM children WHERE parent_id = parent_ids[1] LIMIT 1;
   
-  -- Create an active match with Pro 1
-  INSERT INTO matches (child_id, professional_id, status, hourly_rate, metric_keys)
-  VALUES (v_id, pro_user_ids[1], 'active', 75, '{sensory_regulation,social_interaction,routine_transition}');
-  
-  -- Insert some checkins and daily logs for this match to demonstrate WP5 retention charts
-  -- We assume the match_id is the one we just inserted. Since matches has no explicit UUID returned easily here, we do it via subquery
-  INSERT INTO checkins (match_id, lat, lng, is_valid)
-  SELECT id, 32.08, 34.78, true FROM matches WHERE child_id = v_id AND professional_id = pro_user_ids[1];
+  -- Get the Professional ID of the first professional
+  DECLARE
+    v_pro_id UUID;
+  BEGIN
+    SELECT id INTO v_pro_id FROM professionals WHERE user_id = pro_user_ids[1] LIMIT 1;
 
-  INSERT INTO daily_logs (match_id, log_date, mood, metrics, notes, ai_summary)
-  SELECT id, current_date, 'great', '{"sensory_regulation": 4, "social_interaction": 5, "routine_transition": 4}'::jsonb, 'היה יום מצוין, נועם שיחק יפה עם חברים.', 'נועם חווה יום חיובי עם הצלחות חברתיות משמעותיות וויסות סנסורי טוב.' 
-  FROM matches WHERE child_id = v_id AND professional_id = pro_user_ids[1];
+    -- Create an active match with Pro 1
+    INSERT INTO matches (child_id, professional_id, status, metric_keys)
+    VALUES (v_id, v_pro_id, 'active', '{sensory_regulation,social_interaction,routine_transition}');
+    
+    -- Insert some checkins and daily logs for this match to demonstrate WP5 retention charts
+    -- We assume the match_id is the one we just inserted. Since matches has no explicit UUID returned easily here, we do it via subquery
+    INSERT INTO checkins (match_id, location, is_valid)
+    SELECT id, ST_SetSRID(ST_MakePoint(34.78, 32.08), 4326), true FROM matches WHERE child_id = v_id AND professional_id = v_pro_id;
 
-  RETURN 'Seed data created: 5 parents, 10 children, 65 professionals, and mock ops data';
+    INSERT INTO daily_logs (match_id, log_date, mood, metrics, notes, ai_summary)
+    SELECT id, current_date, 5, '{"sensory_regulation": 4, "social_interaction": 5, "routine_transition": 4}'::jsonb, 'היה יום מצוין, נועם שיחק יפה עם חברים.', 'נועם חווה יום חיובי עם הצלחות חברתיות משמעותיות וויסות סנסורי טוב.' 
+    FROM matches WHERE child_id = v_id AND professional_id = v_pro_id;
+  END;
+
 END;
-$$ LANGUAGE plpgsql;
-
--- Run the seed
--- SELECT seed_test_data();
+$$;

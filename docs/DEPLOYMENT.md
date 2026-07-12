@@ -74,10 +74,18 @@ npm run types:generate
 # החסר הקריטי — בלי זה אין AI (סיכומים + הסברי התאמה נופלים ל-fallback):
 npx supabase secrets set CLAUDE_API_KEY=sk-ant-...
 
+# OTP/SMS בפרודקשן (Twilio) — בלי זה login בטלפון מחזיר 500:
+# PowerShell:
+#   $env:TWILIO_ACCOUNT_SID="AC..."
+#   $env:TWILIO_AUTH_TOKEN="..."
+#   $env:TWILIO_PHONE_NUMBER="+972..."   # או TWILIO_MESSAGE_SERVICE_SID
+#   .\scripts\setup-production-sms.ps1
+
 npx supabase secrets list        # אימות
 ```
 
 - `CLAUDE_API_KEY` — מפתח Anthropic. **חסר כרגע.** בלעדיו המערכת עובדת אך ללא שכבת ה-AI.
+- **SMS OTP** — דורש Twilio + `scripts/setup-production-sms.ps1` (Auth Hook `send-sms`). ב-Dashboard: Authentication → Providers → **Phone** חייב להיות מופעל.
 - שאר הסודות (`SUPABASE_SERVICE_ROLE_KEY` וכו') — מוגדרים אוטומטית.
 - לעולם לא בקוד/ב-repo. ראו `docs/SECURITY-GUIDELINES.md` §6.
 

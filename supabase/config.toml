@@ -1,6 +1,6 @@
 [api]
 port = 54321
-schemas = ["public"]
+schemas = ["public", "graphql_public"]
 
 [db]
 port = 54322
@@ -9,26 +9,51 @@ port = 54322
 port = 54323
 
 [auth]
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["exp://localhost:8081"]
+site_url = "http://localhost:8082"
+additional_redirect_urls = [
+  "exp://localhost:8081",
+  "exp://localhost:8082",
+  "http://localhost:8082",
+  "http://localhost:8082/**",
+  "http://localhost:3000",
+  "http://localhost:3000/**",
+]
 jwt_expiry = 3600
 
 [auth.sms]
 enable_signup = true
-enable_confirmations = true
+enable_confirmations = false
+max_frequency = "60s"
 
+# Local Supabase only. Production Twilio stays in Dashboard (Auth → Providers → Phone).
+# Never push mock/real Twilio creds from this file — use scripts/enable-supabase-twilio.ps1
 [auth.sms.twilio]
 enabled = false
-account_sid = ""
-message_service_sid = ""
-auth_token = ""
+
+# Dev/staging OTP without SMS (matches cloud project test numbers).
+[auth.sms.test_otp]
+972500000010 = "123456"
+972501111111 = "123456"
+972521111111 = "123456"
+972523333333 = "123456"
+972524627635 = "123456"
+
+# Disable custom hook only (does not change Dashboard Twilio credentials).
+# WARNING: omitting [auth.sms.twilio] or enabled=false here disables cloud Twilio on push.
+# After push, re-check Dashboard → Phone provider is ON with Twilio.
+[auth.hook.send_sms]
+enabled = false
+
+[functions.send-sms]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-sms/deno.json"
+entrypoint = "./functions/send-sms/index.ts"
 
 [functions.calculate-matches]
 enabled = true
 verify_jwt = false
 import_map = "./functions/calculate-matches/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
 entrypoint = "./functions/calculate-matches/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
@@ -47,6 +72,6 @@ import_map = "./functions/process-daily-log/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
 entrypoint = "./functions/process-daily-log/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/process-daily-log/*.html" ]
+
+[storage.vector]
+enabled = false
