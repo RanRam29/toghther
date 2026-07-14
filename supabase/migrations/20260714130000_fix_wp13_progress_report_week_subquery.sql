@@ -1,17 +1,6 @@
--- Fix: get_child_progress_report counted daily_logs rows, not distinct days.
---
--- 20260714110000_daily_logs_multiple_per_day.sql (deployed to cloud as
--- version 20260714070356 in supabase_migrations.schema_migrations --
--- confirmed via `supabase db query`, same migration under an earlier
--- version number) dropped daily_logs' UNIQUE(match_id, log_date), so a
--- professional can now log several observations on the same day.
--- get_child_progress_report (D53) used count(*) for both the totals
--- 'logs_count' and each week's 'logs' field, so a single day with three
--- notes would silently read as "3 days reported" to a parent instead of
--- "1 day reported, 3 notes". Both occurrences now count DISTINCT log_date
--- to preserve the original meaning (reporting consistency by day), not
--- row count. mood_avg intentionally still averages every row (all
--- observations), which is unaffected by this fix.
+-- Fix: metrics_avg subquery referenced l.log_date outside GROUP BY when multiple
+-- daily_logs exist per week (especially after multi-log-per-day). Use a derived
+-- table with week_start computed per row, then aggregate by match_id + week_start.
 
 CREATE OR REPLACE FUNCTION public.get_child_progress_report(p_child_id uuid, p_from date, p_to date)
 RETURNS jsonb
@@ -24,7 +13,6 @@ DECLARE
   v_matches jsonb := '[]'::jsonb;
   v_totals jsonb;
 BEGIN
-  -- 1. Authentication and Authorization
   SELECT first_name, age INTO v_child
   FROM children
   WHERE id = p_child_id
@@ -35,7 +23,6 @@ BEGIN
     RAISE EXCEPTION 'Not authorized or child not found';
   END IF;
 
-  -- 2. Validation
   IF p_from > p_to THEN
     RAISE EXCEPTION 'Invalid date range: from date must be before or equal to to date';
   END IF;
@@ -44,7 +31,6 @@ BEGIN
     RAISE EXCEPTION 'Date range exceeds maximum allowed duration of 366 days';
   END IF;
 
-  -- 3. Calculate Matches Data
   WITH match_attendance AS (
     SELECT c.match_id, count(DISTINCT (c.created_at AT TIME ZONE 'Asia/Jerusalem')::date) as days_attended
     FROM checkins c
@@ -134,7 +120,6 @@ BEGIN
     AND m.started_at::date <= p_to
     AND (m.ended_at IS NULL OR m.ended_at::date >= p_from);
 
-  -- 4. Calculate Totals directly from v_matches to avoid recalculating
   IF jsonb_array_length(v_matches) > 0 THEN
     SELECT jsonb_build_object(
       'days_attended', COALESCE(SUM((elem->'attendance'->>'days_attended')::int), 0),
@@ -146,7 +131,6 @@ BEGIN
     v_totals := jsonb_build_object('days_attended', 0, 'logs_count', 0, 'mood_avg', 0);
   END IF;
 
-  -- 5. Return JSONB
   RETURN jsonb_build_object(
     'report_version', 1,
     'child', jsonb_build_object(

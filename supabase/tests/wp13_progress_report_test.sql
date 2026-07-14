@@ -3,7 +3,7 @@
 
 BEGIN;
 SET search_path TO public, extensions;
-SELECT plan(16);
+SELECT plan(17);
 
 -- Create some users for testing
 INSERT INTO auth.users (id, email, phone, encrypted_password, aud, role) VALUES
@@ -131,6 +131,14 @@ INSERT INTO daily_logs (match_id, log_date, mood, metrics) VALUES
 SELECT ok(
   (get_child_progress_report('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', (now() - interval '30 days')::date, now()::date)->'totals'->>'logs_count')::int = 2,
   'Logs count stays 2 distinct days after a second same-day entry (3 rows total)'
+);
+
+-- 7c. Regression: multiple logs same week must not hit ungrouped l.log_date subquery error
+SELECT lives_ok(
+  $$SELECT jsonb_array_length(
+    get_child_progress_report('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', (now() - interval '30 days')::date, now()::date)->'matches'->0->'weeks'
+  )$$,
+  'Weekly metrics subquery succeeds with multiple logs in the same week'
 );
 
 -- 8. Anti-leakage tests
