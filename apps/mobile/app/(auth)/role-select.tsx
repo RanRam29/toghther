@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Alert, View, Pressable, Text, Image } from "react-native";
+import { Alert, View, Pressable, Text } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 
 import {
@@ -44,7 +44,6 @@ export default function RoleSelectScreen() {
   }
 
   const videoSource = require("@/assets/videos/toghether.mp4");
-  const logoSource = require("@/assets/images/logo.jpg");
 
   const player = useVideoPlayer(videoSource, player => {
     player.loop = true;
@@ -54,15 +53,11 @@ export default function RoleSelectScreen() {
   return (
     <ScreenShell
       hero={
-        <View className="w-full mb-2">
-          <Image 
-            source={logoSource} 
-            style={{ width: 140, height: 48, resizeMode: "contain" }} 
-            className="mb-6 rounded-lg"
-          />
+        <View className="w-full mb-6 items-center justify-center">
           <VideoView 
             player={player} 
-            style={{ width: "100%", height: 200, borderRadius: 16, overflow: "hidden" }} 
+            style={{ width: "100%", aspectRatio: 16/9, maxHeight: 250, borderRadius: 16, overflow: "hidden" }} 
+            contentFit="contain"
             nativeControls={false} 
           />
         </View>
