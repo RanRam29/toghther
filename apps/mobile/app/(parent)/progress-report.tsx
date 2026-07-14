@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { useState, useMemo } from "react";
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -113,7 +113,11 @@ export default function ProgressReportScreen() {
 
       const { uri } = await Print.printToFileAsync({ html });
       
-      if (await Sharing.isAvailableAsync()) {
+      if (Platform.OS === 'web') {
+        // On web, Print.printAsync can be used to show the browser print dialog
+        await Print.printAsync({ html });
+        await supabase.rpc('track_event', { p_event_name: 'progress_report_shared', p_properties: { period_days: rangeDays, platform: 'web' } });
+      } else if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
         await supabase.rpc('track_event', { p_event_name: 'progress_report_shared', p_properties: { period_days: rangeDays } });
       }

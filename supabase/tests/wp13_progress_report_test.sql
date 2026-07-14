@@ -3,7 +3,7 @@
 
 BEGIN;
 SET search_path TO public, extensions;
-SELECT plan(15);
+SELECT plan(16);
 
 -- Create some users for testing
 INSERT INTO auth.users (id, email, phone, encrypted_password, aud, role) VALUES
@@ -120,6 +120,17 @@ SELECT ok(
 SELECT ok(
   (get_child_progress_report('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', (now() - interval '30 days')::date, now()::date)->'totals'->>'mood_avg')::numeric = 4.5,
   'Average mood is 4.5'
+);
+
+-- 7b. Regression: 20260714110000 dropped daily_logs' UNIQUE(match_id, log_date),
+-- so a professional can now log multiple observations on the same day. logs_count
+-- must still reflect distinct days reported, not raw row count (see 20260714120000).
+INSERT INTO daily_logs (match_id, log_date, mood, metrics) VALUES
+  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', (now() - interval '9 days')::date, 3, '{"regulation": 2, "transitions": 3}');
+
+SELECT ok(
+  (get_child_progress_report('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', (now() - interval '30 days')::date, now()::date)->'totals'->>'logs_count')::int = 2,
+  'Logs count stays 2 distinct days after a second same-day entry (3 rows total)'
 );
 
 -- 8. Anti-leakage tests
