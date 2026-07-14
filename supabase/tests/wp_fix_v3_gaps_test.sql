@@ -12,6 +12,8 @@ SELECT plan(4);
 
 GRANT SELECT ON public.match_hides TO authenticated;
 GRANT SELECT ON public.match_days_off TO authenticated;
+GRANT SELECT ON public.children TO authenticated;
+GRANT SELECT ON public.matches TO authenticated;
 
 INSERT INTO auth.users (id, phone, email, aud, role, raw_user_meta_data) VALUES
   ('f2000000-0000-4000-8000-000000000b01', '0599999911', 'b01@test.local', 'authenticated', 'authenticated', '{"role": "parent"}'),
@@ -46,6 +48,11 @@ BEGIN
   PERFORM set_config('my.prof_user_id', 'f2000000-0000-4000-8000-000000000b02', true);
   PERFORM set_config('my.match_id', v_match_id::text, true);
 END $$;
+
+-- Authenticate as the parent so anonymize_user's self-delete path (auth.uid() = p_user_id) is exercised,
+-- matching the pattern in v3_hardening_test.sql / rls_privacy_test.sql.
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claims', json_build_object('sub', current_setting('my.parent_id'), 'role', 'authenticated')::text, true);
 
 -- 1. anonymize_user must not crash on a user with a review + a document (the exact regression)
 SELECT lives_ok(
