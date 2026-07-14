@@ -226,7 +226,7 @@ export default function IntroDetailScreen() {
 
           <View className="flex-row items-center justify-center mb-6">
             <Ionicons name="call" size={24} color="#534AB7" />
-            <Text className="text-xl font-semibold text-purple ml-3 font-rubik">
+            <Text className="text-xl font-semibold text-purple ms-3 font-rubik">
               {phone}
             </Text>
           </View>
@@ -279,7 +279,7 @@ export default function IntroDetailScreen() {
               מדוע לא התאים?
             </Text>
             <TextInput
-              className="border border-border rounded-lg p-3 text-ink bg-white text-right h-24 mb-4"
+              className="border border-border rounded-lg p-3 text-ink bg-white text-start h-24 mb-4"
               multiline
               textAlignVertical="top"
               placeholder="כתוב בקצרה למה לא הסתדר, זה יעזור לנו למצוא התאמה טובה יותר בפעם הבאה..."

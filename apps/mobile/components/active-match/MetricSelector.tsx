@@ -21,10 +21,10 @@ export function MetricSelector({
 }: MetricSelectorProps) {
   return (
     <View className="mb-6">
-      <Text className="text-lg font-bold text-ink mb-1 font-rubik text-right">
+      <Text className="text-lg font-bold text-ink mb-1 font-rubik text-start">
         {label}
       </Text>
-      <Text className="text-sm text-ink-2 mb-4 text-right leading-5">{hint}</Text>
+      <Text className="text-sm text-ink-2 mb-4 text-start leading-5">{hint}</Text>
       <View className="flex-row flex-wrap gap-2 justify-end">
         {metrics.map((metric) => {
           const isSelected = selected.includes(metric.key);
@@ -53,7 +53,7 @@ export function MetricSelector({
           );
         })}
       </View>
-      <Text className="text-xs text-ink-2 mt-3 text-right">
+      <Text className="text-xs text-ink-2 mt-3 text-start">
         {selected.length}/3
       </Text>
     </View>

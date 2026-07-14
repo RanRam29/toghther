@@ -21,26 +21,31 @@ export function PendingInvitations() {
       Alert.alert(t("success"), t("parent.invitationAccepted", "ההזמנה התקבלה בהצלחה!"));
       queryClient.invalidateQueries({ queryKey: ["my_parent_invitations", session?.user?.id] });
       queryClient.invalidateQueries({ queryKey: ["children", session?.user?.id] });
-    } catch (err: any) {
-      Alert.alert(t("error"), err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t("error");
+      Alert.alert(t("error"), message);
     }
   };
 
   return (
-    <View className="mb-6 space-y-4">
-      {invitations.map((inv: any) => (
-        <View key={inv.id} className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-          <Text className="text-amber-900 text-right font-bold text-lg mb-1">
+    <View className="mb-6 gap-4">
+      {invitations.map((inv: { id: string; child?: { first_name?: string } | null }) => (
+        <View key={inv.id} className="bg-amber-bg p-4 rounded-card border border-amber/30">
+          <Text className="text-amber-ink text-start font-bold text-lg mb-1">
             {t("parent.youAreInvited", "הוזמנת להצטרף לפרופיל")}
           </Text>
-          <Text className="text-amber-800 text-right mb-4">
+          <Text className="text-amber text-start mb-4">
             {t("parent.invitedToChild", "הוזמנת לשמש כהורה נוסף עבור {{name}}", {
               name: inv.child?.first_name || "הילד",
             })}
           </Text>
-          {session?.user?.user_metadata?.role === "professional" || useAuthStore.getState().profile?.role === "professional" ? (
-            <Text className="text-red-700 text-right font-medium">
-              {t("parent.professionalRoleError", "לא ניתן לאשר את ההזמנה. חשבונך רשום כמשלבת במערכת, תפקיד הורה נוסף מיועד להורים בלבד.")}
+          {session?.user?.user_metadata?.role === "professional" ||
+          useAuthStore.getState().profile?.role === "professional" ? (
+            <Text className="text-coral text-start font-medium">
+              {t(
+                "parent.professionalRoleError",
+                "לא ניתן לאשר את ההזמנה. חשבונך רשום כמשלבת במערכת, תפקיד הורה נוסף מיועד להורים בלבד.",
+              )}
             </Text>
           ) : (
             <PrimaryButton

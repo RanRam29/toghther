@@ -13,7 +13,7 @@ export function TodayStatusCard({ message, hasCheckedIn }: TodayStatusCardProps)
       }`}
     >
       <Text
-        className={`text-sm font-semibold leading-5 text-right ${
+        className={`text-sm font-semibold leading-5 text-start ${
           hasCheckedIn ? "text-teal-ink" : "text-ink-2"
         }`}
       >

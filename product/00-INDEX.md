@@ -36,6 +36,7 @@
 | [08-ANALYTICS-EVENTS.md](08-ANALYTICS-EVENTS.md) | אירועי אנליטיקס ומשפכי המרה — לתיעוד מיום 1 | Antigravity |
 | [09-DEFINITION-OF-DONE.md](09-DEFINITION-OF-DONE.md) | צ'קליסט סיום משימה — חובה | כולם |
 | [10-ADMIN-SPEC.md](10-ADMIN-SPEC.md) | אזור המנהל — מפרט מלא (D23) | Cursor, Antigravity |
+| [11-BUSINESS-PLAN.md](11-BUSINESS-PLAN.md) | תוכנית עסקית: מחקר משווה, מודל הכנסה, שערי הכרעה, תהליכי עבודה נגזרים | בעל המוצר, ארכיטקט |
 
 ## מסמכי הנדסה (`docs/`)
 

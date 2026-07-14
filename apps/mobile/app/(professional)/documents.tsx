@@ -95,7 +95,7 @@ export default function ProfessionalDocumentsScreen() {
     >
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="bg-purple-bg border border-purple rounded-card p-4 mb-6">
-          <Text className="text-sm font-bold text-purple-ink mb-2 font-rubik text-right">
+          <Text className="text-sm font-bold text-purple-ink mb-2 font-rubik text-start">
             {t("professional.documentsProgress", { percent: progress })}
           </Text>
           <View className="h-2 bg-surface rounded-full overflow-hidden">
@@ -105,21 +105,21 @@ export default function ProfessionalDocumentsScreen() {
             />
           </View>
           {allRequired && verificationStatus === "submitted" ? (
-            <Text className="text-sm text-teal mt-3 text-right leading-5">
+            <Text className="text-sm text-teal mt-3 text-start leading-5">
               {t("professional.documentsSubmitted")}
             </Text>
           ) : allRequired ? (
-            <Text className="text-sm text-ink-2 mt-3 text-right leading-5">
+            <Text className="text-sm text-ink-2 mt-3 text-start leading-5">
               {t("professional.documentsReadySubmit")}
             </Text>
           ) : (
-            <Text className="text-sm text-ink-2 mt-3 text-right leading-5">
+            <Text className="text-sm text-ink-2 mt-3 text-start leading-5">
               {t("professional.documentsRequiredHint")}
             </Text>
           )}
         </View>
 
-        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-right">
+        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-start">
           {t("professional.documentsRequiredTitle")}
         </Text>
 
@@ -142,7 +142,7 @@ export default function ProfessionalDocumentsScreen() {
           />
         )}
 
-        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-right">
+        <Text className="text-sm font-bold text-purple mb-3 font-rubik text-start">
           {t("professional.documentsOptionalTitle")}
         </Text>
         {OPTIONAL_DOC_TYPES.map((docType) => {

@@ -75,7 +75,7 @@ export default function SettingsScreen() {
         </View>
 
         <View className="bg-surface rounded-card border border-border p-4 mb-6">
-          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-right">
+          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-start">
             {t("settings.pushTitle")}
           </Text>
 
@@ -91,10 +91,10 @@ export default function SettingsScreen() {
                   thumbColor="#FFFFFF"
                 />
                 <View className="flex-1 ms-3">
-                  <Text className="text-base font-semibold text-ink text-right">
+                  <Text className="text-base font-semibold text-ink text-start">
                     {t("settings.checkinLabel")}
                   </Text>
-                  <Text className="text-sm text-ink-2 text-right">
+                  <Text className="text-sm text-ink-2 text-start">
                     {t("settings.checkinDesc")}
                   </Text>
                 </View>
@@ -108,10 +108,10 @@ export default function SettingsScreen() {
                   thumbColor="#FFFFFF"
                 />
                 <View className="flex-1 ms-3">
-                  <Text className="text-base font-semibold text-ink text-right">
+                  <Text className="text-base font-semibold text-ink text-start">
                     {t("settings.dailySummaryLabel")}
                   </Text>
-                  <Text className="text-sm text-ink-2 text-right">
+                  <Text className="text-sm text-ink-2 text-start">
                     {t("settings.dailySummaryDesc")}
                   </Text>
                 </View>
@@ -121,14 +121,14 @@ export default function SettingsScreen() {
         </View>
 
         <View className="bg-surface rounded-card border border-border p-4 mb-6">
-          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-right">
+          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-start">
             {t("guide.howToTitle")}
           </Text>
           <Pressable
             onPress={() => router.push("/how-to-use" as never)}
             className="py-3 flex-row-reverse items-center justify-between"
           >
-            <Text className="text-base text-purple text-right font-rubik">
+            <Text className="text-base text-purple text-start font-rubik">
               {t("guide.openGuide")}
             </Text>
             <Ionicons name="help-circle-outline" size={20} color="#534AB7" />
@@ -136,19 +136,19 @@ export default function SettingsScreen() {
         </View>
 
         <View className="bg-surface rounded-card border border-border p-4 mb-6">
-          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-right">
+          <Text className="text-lg font-bold text-ink mb-4 font-rubik text-start">
             {t("settings.legalTitle")}
           </Text>
           <Pressable
             onPress={() => router.push("/legal/privacy" as never)}
             className="py-3 border-b border-border/50"
           >
-            <Text className="text-base text-purple text-right font-rubik">
+            <Text className="text-base text-purple text-start font-rubik">
               {t("legal.privacyTitle")}
             </Text>
           </Pressable>
           <Pressable onPress={() => router.push("/legal/terms" as never)} className="py-3">
-            <Text className="text-base text-purple text-right font-rubik">
+            <Text className="text-base text-purple text-start font-rubik">
               {t("legal.termsTitle")}
             </Text>
           </Pressable>

@@ -39,17 +39,17 @@ export default function PendingVerificationScreen() {
       backFallbackHref="/(professional)"
     >
       <View className="bg-amber-bg border border-amber rounded-card p-5 mb-6">
-        <Text className="text-amber-ink font-bold text-lg mb-2 font-rubik text-right">
+        <Text className="text-amber-ink font-bold text-lg mb-2 font-rubik text-start">
           {t(`enums.verification.${verificationStatus}`)}
         </Text>
-        <Text className="text-sm text-ink-2 text-right leading-6">{statusMessage}</Text>
-        <Text className="text-xs text-ink-2 mt-3 text-right">
+        <Text className="text-sm text-ink-2 text-start leading-6">{statusMessage}</Text>
+        <Text className="text-xs text-ink-2 mt-3 text-start">
           {t("professional.pendingSla")}
         </Text>
       </View>
 
       <View className="bg-surface border border-border rounded-card p-4 mb-6">
-        <Text className="text-sm font-bold text-ink mb-2 font-rubik text-right">
+        <Text className="text-sm font-bold text-ink mb-2 font-rubik text-start">
           {t("professional.documentsProgress", { percent: progress })}
         </Text>
         <View className="h-2 bg-bg rounded-full overflow-hidden mb-4">

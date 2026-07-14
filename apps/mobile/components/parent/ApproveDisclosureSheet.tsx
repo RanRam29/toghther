@@ -31,10 +31,10 @@ export function ApproveDisclosureSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onCancel}>
       <View className="flex-1 justify-end bg-black/40">
         <View className="bg-bg rounded-t-3xl px-5 pt-6 pb-8 max-h-[85%]">
-          <Text className="text-xl font-bold text-ink mb-2 font-rubik text-right">
+          <Text className="text-xl font-bold text-ink mb-2 font-rubik text-start">
             {title}
           </Text>
-          <Text className="text-sm text-ink-2 mb-4 text-right leading-6">
+          <Text className="text-sm text-ink-2 mb-4 text-start leading-6">
             {subtitle.replace("{{name}}", childName)}
           </Text>
 
@@ -44,7 +44,7 @@ export function ApproveDisclosureSheet({
                 key={item}
                 className="flex-row items-start gap-2 mb-3 justify-end"
               >
-                <Text className="text-sm text-ink flex-1 text-right leading-5">
+                <Text className="text-sm text-ink flex-1 text-start leading-5">
                   {item}
                 </Text>
                 <Text className="text-purple text-base">•</Text>

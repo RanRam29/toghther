@@ -1,29 +1,20 @@
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
+import { getTabBarStyle } from "@/lib/platform";
+import { colors } from "@/lib/theme";
 
 export default function ParentTabsLayout() {
   const { t } = useTranslation();
-
-  const tabBarStyle =
-    Platform.OS === "web"
-      ? {
-          backgroundColor: "#FFFFFF",
-          borderTopColor: "#E5E2DA",
-          maxWidth: 1024,
-          width: "100%" as const,
-          alignSelf: "center" as const,
-        }
-      : { backgroundColor: "#FFFFFF", borderTopColor: "#E5E2DA" };
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#534AB7",
-        tabBarInactiveTintColor: "#918D84",
-        tabBarStyle,
+        tabBarActiveTintColor: colors.purple,
+        tabBarInactiveTintColor: colors.ink3,
+        tabBarStyle: getTabBarStyle({ wide: true }),
         tabBarLabelStyle: { fontFamily: "Rubik_500Medium", fontSize: 12 },
       }}
     >

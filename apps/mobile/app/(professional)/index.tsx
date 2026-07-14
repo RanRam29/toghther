@@ -75,8 +75,8 @@ export default function ProfessionalHomeScreen() {
       title={t("professional.homeTitle")}
       subtitle={t("professional.homeSubtitle")}
       headerRight={
-        <Pressable onPress={() => router.push("/settings")} className="p-2 -mr-2 bg-surface rounded-full border border-border">
-          <Ionicons name="settings-outline" size={24} color="#534AB7" />
+        <Pressable onPress={() => router.push("/settings")} className="p-2 -me-2 bg-surface rounded-full border border-border">
+          <Ionicons name="settings-outline" size={24} color="#0F6E56" />
         </Pressable>
       }
     >

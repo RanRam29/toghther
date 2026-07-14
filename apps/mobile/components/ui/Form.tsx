@@ -11,9 +11,19 @@ import {
   type TextInputProps,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 import { AppPageWidth } from "@/components/ui/AppPageWidth";
 import { BackButton } from "@/components/ui/BackButton";
+import { lightHaptic, PRESS_SCALE, shouldAnimatePress } from "@/lib/motion";
+import { webPressableClass } from "@/lib/platform";
+import { colors } from "@/lib/theme";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface TextFieldProps extends TextInputProps {
   label: string;
@@ -41,7 +51,7 @@ export function TextField({
         }`}
       >
         <TextInput
-          placeholderTextColor="#918D84"
+          placeholderTextColor={colors.ink3}
           className={`flex-1 px-4 py-4 text-ink text-base ${className ?? ""}`}
           secureTextEntry={isSecure}
           {...props}
@@ -57,7 +67,7 @@ export function TextField({
             <Ionicons
               name={passwordVisible ? "eye-off-outline" : "eye-outline"}
               size={22}
-              color="#918D84"
+              color={colors.ink3}
             />
           </Pressable>
         ) : null}
@@ -85,7 +95,7 @@ export function OtpInput({ value, onChange, length = 6 }: OtpInputProps) {
         maxLength={length}
         className="bg-surface border border-border rounded-card px-4 py-5 text-ink text-2xl text-center tracking-[12px] font-rubik"
         placeholder={"•".repeat(length)}
-        placeholderTextColor="#D0CCC2"
+        placeholderTextColor={colors.borderStrong}
       />
     </View>
   );
@@ -116,21 +126,62 @@ export function PrimaryButton({
     : Platform.OS === "web"
       ? "self-start"
       : "w-full";
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  function handlePressIn() {
+    if (isDisabled || !shouldAnimatePress()) return;
+    scale.value = withSpring(PRESS_SCALE, { damping: 20, stiffness: 400 });
+  }
+
+  function handlePressOut() {
+    scale.value = withSpring(1, { damping: 16, stiffness: 320 });
+  }
+
+  const buttonClass = `${bgClass} rounded-card py-4 px-6 items-center ${widthClass} ${webPressableClass} ${
+    isDisabled ? "opacity-60" : "active:opacity-90"
+  }`;
+
+  if (!shouldAnimatePress()) {
+    return (
+      <Pressable
+        onPress={() => {
+          if (!isDisabled) lightHaptic();
+          onPress?.();
+        }}
+        disabled={isDisabled}
+        className={buttonClass}
+      >
+        {loading ? (
+          <ActivityIndicator color="#FFFFFF" />
+        ) : (
+          <Text className="text-white text-base font-semibold font-rubik">{label}</Text>
+        )}
+      </Pressable>
+    );
+  }
 
   return (
-    <Pressable
-      onPress={onPress}
+    <AnimatedPressable
+      onPress={() => {
+        if (!isDisabled) lightHaptic();
+        onPress?.();
+      }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={isDisabled}
-      className={`${bgClass} rounded-card py-4 px-6 items-center ${widthClass} ${
-        isDisabled ? "opacity-60" : "active:opacity-90"
-      }`}
+      style={animatedStyle}
+      className={buttonClass}
     >
       {loading ? (
         <ActivityIndicator color="#FFFFFF" />
       ) : (
         <Text className="text-white text-base font-semibold font-rubik">{label}</Text>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -221,14 +272,14 @@ export function ScreenShell({
                   {eyebrow}
                 </Text>
               ) : null}
-              <Text className="text-3xl font-bold text-ink mb-2 font-rubik text-right">
+              <Text className="text-3xl font-bold text-ink mb-2 font-rubik text-start">
                 {title}
               </Text>
             </View>
             {headerRight ? <View className="mt-2 ms-4">{headerRight}</View> : null}
           </View>
           {subtitle ? (
-            <Text className="text-base text-ink-2 mb-8 leading-6 text-right">
+            <Text className="text-base text-ink-2 mb-8 leading-6 text-start">
               {subtitle}
             </Text>
           ) : null}

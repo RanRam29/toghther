@@ -7,7 +7,7 @@
 | parent | 972524627635 | parent.demo@together.test | admin123 | 123456 |
 | professional | 972501111111 | pro.demo@together.test | admin123 | 123456 |
 | prof (unverified)* | 972525555555 | pro.unverified@together.test | admin123 | 123456 |
-| admin | 972521111111 | admin.demo@together.test | admin123 | 123456 |
+| admin | 972521111111 | admin.demo@together.test | **admin123** | 123456 |
 | supervisor | 972522222222 | supervisor.demo@together.test | admin123 | 123456 |
 | parent (seed) | 972502222222 | 972502222222@together.test | admin123 | — |
 

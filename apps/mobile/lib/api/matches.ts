@@ -3,6 +3,10 @@ import type { MatchRequest, TablesInsert } from "@toghther/shared";
 import { supabase } from "@/lib/supabase";
 import type { ChildMatch } from "@/lib/types";
 
+export type ParentMatchRequest = MatchRequest & {
+  professional: { display_name: string } | null;
+};
+
 export async function getMatchesForChild(
   childId: string,
   limit = 5,
@@ -29,17 +33,17 @@ export async function getMatchesForChild(
 
 export async function fetchMatchRequestsForParent(
   childIds: string[],
-): Promise<MatchRequest[]> {
+): Promise<ParentMatchRequest[]> {
   if (childIds.length === 0) return [];
 
   const { data, error } = await supabase
     .from("match_requests")
-    .select("*")
+    .select("*, professional:professionals(display_name)")
     .in("child_id", childIds)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as unknown as ParentMatchRequest[];
 }
 
 export async function createMatchRequest(

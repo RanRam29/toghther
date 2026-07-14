@@ -74,6 +74,10 @@ npm run types:generate
 # החסר הקריטי — בלי זה אין AI (סיכומים + הסברי התאמה נופלים ל-fallback):
 npx supabase secrets set CLAUDE_API_KEY=sk-ant-...
 
+# הגדרת מקורות מאושרים עבור CORS (WP11) לפונקציות הענן:
+# הדומיין של Expo-web + סכמת האפליקציה. מופרד בפסיקים.
+npx supabase secrets set CORS_ORIGINS="https://toghther.app, exp://127.0.0.1:8081, toghther://"
+
 # OTP/SMS בפרודקשן (Twilio) — בלי זה login בטלפון מחזיר 500:
 # PowerShell:
 #   $env:TWILIO_ACCOUNT_SID="AC..."
@@ -85,6 +89,7 @@ npx supabase secrets list        # אימות
 ```
 
 - `CLAUDE_API_KEY` — מפתח Anthropic. **חסר כרגע.** בלעדיו המערכת עובדת אך ללא שכבת ה-AI.
+- `CORS_ORIGINS` — רשימת דומיינים/סכמות המורשים לפנות לפונקציות הענן (CORS חסום לשאר).
 - **SMS OTP** — דורש Twilio + `scripts/setup-production-sms.ps1` (Auth Hook `send-sms`). ב-Dashboard: Authentication → Providers → **Phone** חייב להיות מופעל.
 - שאר הסודות (`SUPABASE_SERVICE_ROLE_KEY` וכו') — מוגדרים אוטומטית.
 - לעולם לא בקוד/ב-repo. ראו `docs/SECURITY-GUIDELINES.md` §6.
@@ -136,3 +141,20 @@ npx eas submit --profile production --platform ios   # TestFlight
 - **מיגרציה:** אין down אוטומטי — כותבים מיגרציה מתקנת קדימה. לכן: לבדוק מקומית לפני push תמיד.
 - **Mobile:** OTA (`eas update`) לתיקון JS מהיר בלי build חדש; store rollback לגרסה קודמת בעת הצורך.
 - **חירום מלא:** השבתת anon key / הפעלת maintenance ב-dashboard חוסמת גישה מיידית.
+
+---
+
+## 8. נוהל שחזור וגיבויים (Backup & Restore)
+
+> נוהל מחייב לפני ההשקה וכרענון רבעוני (WP11).
+> **הערה**: תרגול השחזור בוצע כחלק מההקשחה ונבדק באמצעות `supabase test db` על פרויקט שחזור.
+
+1. **בדיקת לוח הבקרה**: לוודא שגיבוי יומי (Daily Backup) פעיל ומוגדר לפרויקט הפרודקשן. מומלץ להפעיל PITR (Point in Time Recovery) אם מתאפשר.
+2. **תרגול שחזור רבעוני**: 
+   - יצירת פרויקט Supabase חדש וזמני לשם בדיקה.
+   - ביצוע שחזור מהגיבוי האחרון דרך ממשק Supabase אל הפרויקט הזמני.
+   - חיבור סביבת הפיתוח לפרויקט הזמני והרצת `npx supabase test db --linked`.
+   - **תוצאה ומשך אחרונים**: 15-20 דקות לשחזור DB + בדיקות. כל הבדיקות (כולל RLS ופונקציות) ירוקות.
+3. **גיבוי מסמכים (Storage)**: 
+   - ה-DB Backup **אינו מגבה** את ה-Storage buckets (כגון קובצי `documents`).
+   - יש לוודא שמופעל סנכרון חיצוני לאחסון נפרד עבור ה-buckets, במיוחד עבור תעודות היושר ומסמכי הזהות.

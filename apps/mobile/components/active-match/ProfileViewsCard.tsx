@@ -19,11 +19,11 @@ export function ProfileViewsCard({
 }: ProfileViewsCardProps) {
   return (
     <View className="bg-surface border border-border rounded-card p-4 mb-4">
-      <Text className="text-base font-bold text-ink mb-3 font-rubik text-right">
+      <Text className="text-base font-bold text-ink mb-3 font-rubik text-start">
         {title}
       </Text>
       {entries.length === 0 ? (
-        <Text className="text-sm text-ink-2 text-right">{emptyLabel}</Text>
+        <Text className="text-sm text-ink-2 text-start">{emptyLabel}</Text>
       ) : (
         entries.map((entry) => (
           <View

@@ -1,0 +1,23 @@
+/** JS mirror of `tailwind.config.js` — use when className tokens are unavailable. */
+export const colors = {
+  bg: "#FBFAF7",
+  surface: "#FFFFFF",
+  surface2: "#F4F2EC",
+  ink: "#24221E",
+  ink2: "#5F5C55",
+  ink3: "#918D84",
+  border: "#E5E2DA",
+  borderStrong: "#D0CCC2",
+  purple: "#534AB7",
+  purpleBg: "#EEEDFE",
+  purpleInk: "#3C3489",
+  teal: "#0F6E56",
+  tealBg: "#E1F5EE",
+  tealInk: "#085041",
+  amber: "#BA7517",
+  amberBg: "#FAEEDA",
+  amberInk: "#633806",
+  coral: "#D85A30",
+  coralBg: "#FAECE7",
+  coralInk: "#712B13",
+} as const;

@@ -4,6 +4,7 @@ import * as Localization from "expo-localization";
 import { I18nManager } from "react-native";
 
 import type { AppLanguage } from "@/lib/types";
+import { applyWebDocumentDirection } from "@/lib/platform";
 import he from "./locales/he.json";
 import en from "./locales/en.json";
 
@@ -20,6 +21,8 @@ function resolveLanguage(preferred?: AppLanguage): AppLanguage {
 
 export async function applyRTL(language: AppLanguage): Promise<boolean> {
   const shouldBeRTL = language === "he";
+  applyWebDocumentDirection(language);
+
   if (I18nManager.isRTL === shouldBeRTL) return false;
 
   I18nManager.allowRTL(shouldBeRTL);

@@ -95,7 +95,7 @@ export default function MatchDetailScreen() {
 
         {params.matchReason ? (
           <View className="bg-purple/10 p-4 rounded-xl mb-6">
-            <Text className="text-purple font-semibold text-right leading-5">
+            <Text className="text-purple font-semibold text-start leading-5">
               {formatMatchReason(params.matchReason, t)}
             </Text>
           </View>
@@ -103,13 +103,13 @@ export default function MatchDetailScreen() {
 
         {params.professionalId ? (
           <View className="mb-6">
-            <Text className="text-lg font-bold text-ink mb-3 font-rubik text-right">
+            <Text className="text-lg font-bold text-ink mb-3 font-rubik text-start">
               {t("reviews.ratingTitle")}
             </Text>
             <View className="bg-surface p-4 rounded-xl border border-border mb-4">
               <ReviewsSummary professionalId={params.professionalId} />
             </View>
-            <Text className="text-base font-bold text-ink mb-3 font-rubik text-right">
+            <Text className="text-base font-bold text-ink mb-3 font-rubik text-start">
               {t("reviews.recentReviews")}
             </Text>
             <ReviewsList professionalId={params.professionalId} limit={3} />

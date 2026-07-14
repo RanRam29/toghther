@@ -21,6 +21,7 @@ import { usePushSetup } from "@/hooks/usePushSetup";
 import { PushPermissionProvider } from "@/components/shared/PushPermissionProvider";
 import { UsageGuideGate } from "@/components/guide/UsageGuideGate";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
+import { bindReduceMotionListener } from "@/lib/motion";
 import { useLocaleStore } from "@/stores/auth-store";
 
 const GestureHandlerRootView =
@@ -59,6 +60,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
     const t = setTimeout(() => setTimedOut(true), 3000);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => bindReduceMotionListener(), []);
 
   const fontsSettled = fontsLoaded || !!fontError || timedOut;
 

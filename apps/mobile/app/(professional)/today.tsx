@@ -156,10 +156,10 @@ export default function ProfessionalTodayScreen() {
           />
         ) : (
           <View className="bg-purple-bg border border-purple rounded-card p-5 mb-4">
-            <Text className="text-lg font-bold text-purple-ink mb-2 font-rubik text-right">
+            <Text className="text-lg font-bold text-purple-ink mb-2 font-rubik text-start">
               {t("professional.todayQuestionnaireTitle")}
             </Text>
-            <Text className="text-sm text-ink-2 mb-4 text-right leading-5">
+            <Text className="text-sm text-ink-2 mb-4 text-start leading-5">
               {todayLog
                 ? t("professional.todayQuestionnaireDone")
                 : t("professional.todayQuestionnaireDesc", { name: childName })}
@@ -184,7 +184,7 @@ export default function ProfessionalTodayScreen() {
 
         {hasCheckedInToday && todayCheckin ? (
           <View className="bg-teal-bg border border-teal rounded-card px-4 py-3 mb-4">
-            <Text className="text-teal-ink text-sm font-semibold text-right">
+            <Text className="text-teal-ink text-sm font-semibold text-start">
               {t("professional.todayCheckedIn", {
                 time: formatTime(todayCheckin.created_at, i18n.language),
               })}
@@ -192,7 +192,7 @@ export default function ProfessionalTodayScreen() {
           </View>
         ) : null}
 
-        <Text className="text-base font-bold text-ink mb-3 font-rubik text-right">
+        <Text className="text-base font-bold text-ink mb-3 font-rubik text-start">
           {t("professional.todayWeekHistory")}
         </Text>
 
@@ -217,7 +217,7 @@ export default function ProfessionalTodayScreen() {
             </View>
           ))
         ) : (
-          <Text className="text-sm text-ink-2 text-right mb-4">
+          <Text className="text-sm text-ink-2 text-start mb-4">
             {t("professional.todayNoCheckins")}
           </Text>
         )}

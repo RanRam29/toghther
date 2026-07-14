@@ -84,13 +84,13 @@ export function SecondaryParentSettings({ child }: { child: Child }) {
 
   return (
     <View className="mt-8 pt-6 border-t border-gray-200">
-      <Text className="text-xl font-bold text-gray-900 text-right mb-4">
+      <Text className="text-xl font-bold text-gray-900 text-start mb-4">
         {t("parent.secondaryParentTitle", "הורה נוסף / אפוטרופוס")}
       </Text>
 
       {isPrimary && !child.secondary_parent_id && !pendingInvitation && (
         <View className="bg-gray-50 p-4 rounded-xl">
-          <Text className="text-gray-700 text-right mb-4">
+          <Text className="text-gray-700 text-start mb-4">
             {t("parent.inviteSecondaryDesc", "תוכלו להזמין הורה נוסף שיצטרף לפרופיל הילד.")}
           </Text>
           <TextField
@@ -108,10 +108,10 @@ export function SecondaryParentSettings({ child }: { child: Child }) {
 
       {isPrimary && pendingInvitation && (
         <View className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-          <Text className="text-amber-800 text-right font-semibold">
+          <Text className="text-amber-800 text-start font-semibold">
             {t("parent.invitationPending", "הזמנה ממתינה לאישור")}
           </Text>
-          <Text className="text-amber-700 text-right mt-1 mb-4">
+          <Text className="text-amber-700 text-start mt-1 mb-4">
             {pendingInvitation.invited_phone}
           </Text>
           <PrimaryButton label={t("parent.cancelInvite", "ביטול הזמנה")} onPress={handleRemove} loading={loading} />
@@ -120,13 +120,13 @@ export function SecondaryParentSettings({ child }: { child: Child }) {
 
       {child.secondary_parent_id && (
         <View className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <Text className="text-blue-900 text-right font-semibold mb-2">
+          <Text className="text-blue-900 text-start font-semibold mb-2">
             {isPrimary ? t("parent.secondaryParentActive", "הורה שני מחובר") : t("parent.youAreSecondary", "אתה מחובר כהורה שני")}
           </Text>
           
           {isPrimary && (
             <View className="mt-4 border-t border-blue-200 pt-4">
-              <Text className="text-blue-900 text-right font-medium mb-3">
+              <Text className="text-blue-900 text-start font-medium mb-3">
                 {t("parent.permissions", "הרשאות להורה השני:")}
               </Text>
               
@@ -136,7 +136,7 @@ export function SecondaryParentSettings({ child }: { child: Child }) {
                   onValueChange={(val) => togglePermission("can_edit", val)}
                   disabled={loading}
                 />
-                <Text className="text-gray-800 mr-3">
+                <Text className="text-gray-800 me-3">
                   {t("parent.canEdit", "יכול לערוך פרטים")}
                 </Text>
               </View>
@@ -147,7 +147,7 @@ export function SecondaryParentSettings({ child }: { child: Child }) {
                   onValueChange={(val) => togglePermission("can_approve", val)}
                   disabled={loading}
                 />
-                <Text className="text-gray-800 mr-3">
+                <Text className="text-gray-800 me-3">
                   {t("parent.canApprove", "יכול לאשר בקשות שילוב")}
                 </Text>
               </View>

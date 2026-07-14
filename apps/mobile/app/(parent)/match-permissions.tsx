@@ -108,7 +108,7 @@ export default function MatchPermissionsScreen() {
       backFallbackHref="/(active-match)"
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text className="text-base font-bold text-ink mb-3 font-rubik text-right">
+        <Text className="text-base font-bold text-ink mb-3 font-rubik text-start">
           {t("permissions.visibleTitle")}
         </Text>
         <View className="bg-surface border border-border rounded-card p-4 mb-6">
@@ -117,10 +117,10 @@ export default function MatchPermissionsScreen() {
             <View className="mb-3 border-b border-border/40 pb-3 flex-row justify-between items-center">
               <Text className="text-sm text-ink-2 font-medium">{t("permissions.alwaysVisible")}</Text>
               <View>
-                <Text className="text-xs text-purple font-bold mb-1 text-right">
+                <Text className="text-xs text-purple font-bold mb-1 text-start">
                   {t("permissions.fields.full_name")}
                 </Text>
-                <Text className="text-sm text-ink-2 text-right leading-5">{details.data.full_name}</Text>
+                <Text className="text-sm text-ink-2 text-start leading-5">{details.data.full_name}</Text>
               </View>
             </View>
           ) : null}
@@ -135,11 +135,11 @@ export default function MatchPermissionsScreen() {
                   trackColor={{ false: "#E2E8F0", true: "#534AB7" }}
                   thumbColor="#FFFFFF"
                 />
-                <View className="flex-1 ml-4">
-                  <Text className="text-xs text-purple font-bold mb-1 text-right">
+                <View className="flex-1 ms-4">
+                  <Text className="text-xs text-purple font-bold mb-1 text-start">
                     {t(`permissions.fields.${key}`)}
                   </Text>
-                  <Text className="text-sm text-ink-2 text-right">
+                  <Text className="text-sm text-ink-2 text-start">
                     {isHidden ? t("permissions.hiddenState", { name: proName }) : t("permissions.visibleState", { name: proName })}
                   </Text>
                 </View>
