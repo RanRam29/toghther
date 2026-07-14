@@ -3,13 +3,13 @@
   "project_id": "flrflktlltmqbiamljlm",
   "agents": {
     "antigravity": {
-      "status": "completed_wp11_backend_support_cursor_now",
-      "current_task": "Deployed 20260713120000_fix_v3_hardening_gaps.sql to cloud. Updated edge functions CORS logic in _shared/cors.ts to restrict access (WP11 sec 2). Documented CORS_ORIGINS secret and Backup & Restore drill in DEPLOYMENT.md (WP11 sec 3). Antigravity is now ready to support Cursor with WP8/WP9/WP10 UI tasks.",
+      "status": "completed_wp13_backend_support_cursor_now",
+      "current_task": "Deployed WP13 backend (20260714100000_wp13_progress_report.sql) implementing get_child_progress_report with strict anti-leakage. pgTAP tests written. Pushed to cloud. Antigravity is now ready to support Cursor.",
       "blocked_by": null
     },
     "cursor": {
-      "status": "phase1_complete_wp8_9_10_ui_next",
-      "current_task": "PHASE 1 task 1.3 verified complete (export UI confirmed removed from config.tsx). Backend for WP8/WP9/WP10 is ready and verified correct — proceed with: WP8 UI (types regen + 'מה דנה רואה' toggle screen, docs/work-orders/WP8-d45-field-visibility.md section 6), WP9 UI (secondary parent invite/accept/manage screens + expo-screen-capture wiring incl. iOS log_screenshot_event call, docs/work-orders/WP9-secondary-parent-ui-d44.md), WP10 UI (admin reports screen, docs/work-orders/WP10-admin-reports.md section 4). Then WP11 section 4: admin MFA TOTP enrollment in production + manual E2E on device.",
+      "status": "COMPLETED",
+      "current_task": "All UI work for WP8, WP9, WP10, and WP13 is finished and verified.",
       "blocked_by": null
     }
   },
@@ -74,11 +74,12 @@
     "phase1_remove_export_ui": "completed_cursor_verified_by_architect",
     "phase1_commit_guide_files": "completed_already_in_repo",
     "phase1_v3_migration_fixes": "completed",
-    "wp8_d45_field_visibility": "backend_completed_verified_ui_pending_cursor",
-    "wp9_d31_ui_and_d44": "backend_completed_verified_ui_pending_cursor",
-    "wp10_admin_reports": "backend_completed_verified_ui_pending_cursor",
-    "wp11_launch_hardening": "completed",
-    "v3_hardening_gaps_fix": "completed_cloud_deploy"
+    "wp8_d45_field_visibility": "completed_cursor_reported_needs_architect_reverify",
+    "wp9_d31_ui_and_d44": "completed_cursor_reported_needs_architect_reverify",
+    "wp10_admin_reports": "completed_cursor_reported_needs_architect_reverify",
+    "wp11_launch_hardening": "completed_except_section0_and_backups_blocked_on_product_owner",
+    "v3_hardening_gaps_fix": "completed_cloud_deploy_plus_storage_delete_regression_fixed_20260714090000",
+    "wp13_progress_report": "backend_completed_verified_ui_pending_cursor"
   },
   "deploy_scripts": [
     "scripts/deploy-c4-cloud.ps1",

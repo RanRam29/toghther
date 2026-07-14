@@ -1,5 +1,11 @@
 # 🚦 Together — לוח תיאום וסטטוס סוכנים
 
+> ✅ **ארכיטקט (2026-07-14, מאוחר יותר) — נמצא ותוקן באג פרודקשן חי ב-`anonymize_user`.**
+> תוך כדי אימות מקומי של `20260713120000_fix_v3_hardening_gaps.sql` (שכבר היה מקומיט ב-`697bf4a`) התגלה ש-schema ה-Storage של הפרויקט כולל טריגר `storage.protect_delete` על `storage.objects` (חוסם `DELETE` ישיר אלא אם `storage.allow_delete_query` מוגדר) — הפונקציה לא הגדירה את ה-GUC הזה, כך שמחיקת חשבון של כל משתמש עם מסמך מועלה **קרסה בפרודקשן**. אומת ישירות מול הענן (`supabase db dump --linked`) שזה היה המצב בפועל, לא רק חשש תיאורטי. **תוקן ונפרס:** מיגרציה חדשה `20260714090000_fix_anonymize_user_storage_delete.sql` (commit `ff19d71`, כבר בענן). בנוסף תוקן `wp_fix_v3_gaps_test.sql` — הבדיקה עצמה לא אימתה משתמש לפני קריאה ל-`anonymize_user`, כך ש-`auth.uid()` היה NULL והנתיב שהיא התיימרה לבדוק (self-delete) מעולם לא רץ בפועל.
+> **כלל חדש לתשומת לב:** אם פונקציה חדשה/מתוקנת מוחקת ישירות מ-`storage.objects` — יש להגדיר `PERFORM set_config('storage.allow_delete_query', 'true', true)` באותה טרנזקציה, אחרת התיקון ייכשל בשקט בענן גם אם ירוק מקומית (הטריגר קיים בכל סביבה, כולל מקומית — נבדק).
+> WP11 §1 (rate limits) ו-§2 (CORS) אומתו כהושלמו בפועל בענן (`CORS_ORIGINS` secret קיים, עודכן היום). §0 (admin123) נשאר תלוי בהחלטת מוצר במפורש — לא בוצע. §3 (גיבויים) עדיין חוסם אמיתי, ראו למטה.
+> ---
+>
 > 🔴 **ממצא ארכיטקט (2026-07-14) — אין גיבוי לפרויקט הפרודקשן. חוסם השקה אמיתי, לא סעיף סגור.**
 > אימתתי ישירות מול הענן (`npx supabase backups list`, קריאה בלבד): `pitr_enabled: false`, `backups: []`. **אפס גיבויים קיימים כרגע ל-`flrflktlltmqbiamljlm`.** התיעוד ב-`docs/DEPLOYMENT.md` §8 טען בעבר ש"תרגול השחזור בוצע ונבדק" — תוקן, כי זה לא יכול היה להיות נכון במצב הזה (אין ממה לשחזר). הפעלת גיבוי יומי/PITR דורשת ברוב המקרים שדרוג תוכנית בתשלום — **החלטה של בעל המוצר, לא פעולת קוד.** אחראי: בעל המוצר (שדרוג תוכנית ב-Supabase dashboard) ← אחרי זה Antigravity מריץ בפועל תרגול שחזור אמיתי ומתעד תוצאה מאומתת (לא הצהרה).
 > ---
@@ -168,11 +174,10 @@
 - [x] **WP5: Daily Ops Tooling** (Check-in logging and admin viewing). 
 - [x] **WP6: Admin Analytics** (Basic metrics for supervisors).
 - [x] **WP7: Admin MFA** (AAL2 enforcement for sensitive Admin APIs).
-- [x] **WP8: Field Visibility API** (Parent-controlled data exposure logic).
-- [x] **WP9: Screenshot Protection API** (Audit logging logic).
-- [x] **WP10: Admin Reports** (Advanced SQL aggregations for admin analytics).
-- [x] **WP11: Launch Hardening** (RPC Rate Limiting, CORS, PII Log cleanup).
-- [x] **WP13: Parent Progress Report Backend** (get_child_progress_report RPC and anti-leakage).
+- [x] **WP8: Professional View Child Details**: Create strictly-masked professional view (`S-PRO-09`) powered by `get_child_details`.
+- [x] **WP9: Secondary Parent Enforcement**: Enforce read-only UI if `manage_visibility=false`. Add "Transfer Ownership" UI logic.
+- [x] **WP10: Admin Analytics UI**: Implement LineChart + date range pickers in Admin Analytics.
+- [x] **WP13: Parent Progress Report**: Fully Implemented (Backend RPC, Types, Frontend Screen, PDF Export).
 - [x] אתחול פרויקט Expo SDK 53 ב-`apps/mobile`
 - [x] הגדרת NativeWind (+ design tokens מהמפרט)
 - [x] הגדרת Expo Router (כולל role-based routing ל-parent ו-professional)
