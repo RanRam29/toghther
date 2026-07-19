@@ -14,8 +14,8 @@ VALUES ('88888888-8888-8888-8888-888888888888', '88888888-8888-8888-8888-8888888
 
 -- Create a dummy parent and child
 INSERT INTO auth.users (id, email) VALUES ('99999999-9999-9999-9999-999999999999', 'parent_test_wp15@example.com');
-INSERT INTO public.children (id, user_id, parent_id, first_name, published, category, location, framework, hours_needed)
-VALUES ('99999999-9999-9999-9999-999999999999', '99999999-9999-9999-9999-999999999999', '99999999-9999-9999-9999-999999999999', 'Child WP15', true, 'autism', ST_SetSRID(ST_MakePoint(34.7818, 32.0853), 4326), 'mainstream', '{"sunday": ["08:00-12:00"]}'::jsonb);
+INSERT INTO public.children (id, parent_id, first_name, age, functioning_level, published, category, location, framework, hours_needed)
+VALUES ('99999999-9999-9999-9999-999999999999', '99999999-9999-9999-9999-999999999999', 'Child WP15', 5, 2, true, 'autism', ST_SetSRID(ST_MakePoint(34.7818, 32.0853), 4326), 'regular_school', '{"sunday": ["08:00-12:00"]}'::jsonb);
 
 -- Clear push queue to test insertions
 DELETE FROM public.push_queue;

@@ -28,8 +28,8 @@ BEGIN
         (v_unrelated_parent_id, 'parent', 'Parent Unrelated');
 
     -- Create child
-    INSERT INTO public.children (id, parent_id, first_name) VALUES
-        (v_child_id, v_parent_id, 'Child 1');
+    INSERT INTO public.children (id, parent_id, first_name, age, category, functioning_level, framework) VALUES
+        (v_child_id, v_parent_id, 'Child 1', 6, 'autism', 2, 'regular_school');
 
     -- Create professional
     INSERT INTO public.professionals (id, user_id, verified) VALUES

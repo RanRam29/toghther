@@ -5,6 +5,7 @@ SELECT plan(9);
 -- 1. Setup Test Data
 -- Create a parent, child, professional, and match
 SELECT auth.uid() INTO my_uid FROM auth.users LIMIT 1; -- Assume running as professional
+PERFORM set_config('request.jwt.claims', format('{"sub": "%s", "role": "authenticated"}', my_uid), true);
 
 -- 2. Test get_my_monthly_attendance
 -- Since the exact data depends on state, we test the shape

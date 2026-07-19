@@ -25,8 +25,8 @@ INSERT INTO profiles (id, role, full_name, phone) VALUES
 INSERT INTO professionals (id, user_id, display_name) VALUES
   ('b1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'a1eebc99-0000-4ef8-bb6d-6bb9bd38d702', 'DL Prof');
 
-INSERT INTO children (id, parent_id, first_name, age, category, framework) VALUES
-  ('c1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'a1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'DL Child', 6, 'autism', 'regular_school');
+INSERT INTO children (id, parent_id, first_name, age, category, functioning_level, framework) VALUES
+  ('c1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'a1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'DL Child', 6, 'autism', 2, 'regular_school');
 
 INSERT INTO matches (id, child_id, professional_id, started_at, metric_keys) VALUES
   ('d1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'c1eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'b1eebc99-0000-4ef8-bb6d-6bb9bd38d701', now(), '{"regulation"}');

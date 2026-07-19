@@ -22,8 +22,8 @@ INSERT INTO professionals (id, user_id, display_name) VALUES
   ('e2eebc99-0000-4ef8-bb6d-6bb9bd38d704', 'f2eebc99-0000-4ef8-bb6d-6bb9bd38d704', 'Prof User Display');
 
 -- Create a child
-INSERT INTO children (id, parent_id, secondary_parent_id, first_name, age, category, framework) VALUES
-  ('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'f2eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'f2eebc99-0000-4ef8-bb6d-6bb9bd38d702', 'Test Child', 5, 'autism', 'regular_school');
+INSERT INTO children (id, parent_id, secondary_parent_id, first_name, age, category, functioning_level, framework) VALUES
+  ('c2eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'f2eebc99-0000-4ef8-bb6d-6bb9bd38d701', 'f2eebc99-0000-4ef8-bb6d-6bb9bd38d702', 'Test Child', 5, 'autism', 2, 'regular_school');
 
 -- Create child details to test leak
 INSERT INTO child_details (child_id, diagnosis_full, notes) VALUES
