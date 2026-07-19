@@ -5,6 +5,8 @@ SELECT plan(9);
 -- 1. Setup Test Data
 -- Create a parent, child, professional, and match
 INSERT INTO auth.users (id, email) VALUES ('a1111111-1111-1111-1111-111111111111', 'dummy@test.com') ON CONFLICT DO NOTHING;
+INSERT INTO public.profiles (id, role, full_name) VALUES ('a1111111-1111-1111-1111-111111111111', 'professional', 'Dummy Pro') ON CONFLICT DO NOTHING;
+INSERT INTO public.professionals (id, user_id, display_name) VALUES ('b1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', 'Dummy Pro') ON CONFLICT DO NOTHING;
 SELECT set_config('request.jwt.claims', format('{"sub": "%s", "role": "authenticated"}', 'a1111111-1111-1111-1111-111111111111'), true);
 
 -- 2. Test get_my_monthly_attendance

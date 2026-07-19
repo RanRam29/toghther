@@ -38,9 +38,9 @@ INSERT INTO match_days_off (match_id, date, reported_by, reason) VALUES
 
 -- Create valid checkins
 INSERT INTO checkins (match_id, location, is_valid, created_at) VALUES
-  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_Point(34.8, 32.1)::geography, true, now() - interval '10 days'),
-  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_Point(34.8, 32.1)::geography, true, now() - interval '9 days'),
-  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_Point(34.8, 32.1)::geography, false, now() - interval '8 days'); -- invalid checkin should be ignored
+  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_SetSRID(ST_MakePoint(34.8, 32.1), 4326)::geography, true, now() - interval '10 days'),
+  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_SetSRID(ST_MakePoint(34.8, 32.1), 4326)::geography, true, now() - interval '9 days'),
+  ('m2eebc99-0000-4ef8-bb6d-6bb9bd38d701', ST_SetSRID(ST_MakePoint(34.8, 32.1), 4326)::geography, false, now() - interval '8 days'); -- invalid checkin should be ignored
 
 -- Create daily logs
 INSERT INTO daily_logs (match_id, log_date, mood, metrics) VALUES
