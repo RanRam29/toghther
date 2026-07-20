@@ -71,15 +71,14 @@ export interface ProfessionalStats {
   user_id: string;
   months_active: number;
   completed_matches: number;
-  reporting_consistency_90d: number;
 }
 
-export function useProfessionalStats(proId: string | undefined) {
+export function useProfessionalPublicStats(proId: string | undefined) {
   return useQuery({
-    queryKey: ["professional_stats", proId],
+    queryKey: ["professional_public_stats", proId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("professional_stats_view" as any)
+        .from("professional_public_stats_view" as any)
         .select("*")
         .eq("professional_id", proId)
         .single();
@@ -89,6 +88,27 @@ export function useProfessionalStats(proId: string | undefined) {
       }
 
       return (data as unknown as ProfessionalStats) || null;
+    },
+    enabled: Boolean(proId),
+  });
+}
+
+export function useMyReportingConsistency(proId: string | undefined) {
+  return useQuery({
+    queryKey: ["professional_reporting_consistency", proId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc(
+        "get_professional_reporting_consistency" as any,
+        {
+          p_professional_id: proId,
+        }
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return (data as number) || 0;
     },
     enabled: Boolean(proId),
   });

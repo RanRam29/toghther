@@ -38,11 +38,11 @@ SELECT throws_ok(
   'mark_days_off_range enforces match validity'
 );
 
--- 4. Test professional_stats_view structure and public access
-SELECT has_view('public', 'professional_stats_view', 'professional_stats_view exists');
+-- 4. Test professional_public_stats_view structure and public access
+SELECT has_view('public', 'professional_public_stats_view', 'professional_public_stats_view exists');
 
-SELECT has_column('public', 'professional_stats_view', 'reporting_consistency_90d', 'Has consistency column');
-SELECT has_column('public', 'professional_stats_view', 'completed_matches', 'Has completed matches column');
+SELECT has_column('public', 'professional_public_stats_view', 'completed_matches', 'Has completed matches column');
+SELECT hasnt_column('public', 'professional_public_stats_view', 'reporting_consistency_90d', 'No longer has consistency column');
 
 SELECT ok(
   EXISTS (
@@ -50,16 +50,16 @@ SELECT ok(
     FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public'
-      AND c.relname = 'professional_stats_view'
+      AND c.relname = 'professional_public_stats_view'
       AND c.relkind = 'v'
       AND 'security_invoker=true' = ANY (c.reloptions)
   ),
-  'professional_stats_view is a security_invoker view'
+  'professional_public_stats_view is a security_invoker view'
 );
 
 SELECT ok(
-  NOT has_table_privilege('anon', 'public.professional_stats_view', 'SELECT'),
-  'anon cannot select from professional_stats_view'
+  NOT has_table_privilege('anon', 'public.professional_public_stats_view', 'SELECT'),
+  'anon cannot select from professional_public_stats_view'
 );
 
 SELECT * FROM finish();

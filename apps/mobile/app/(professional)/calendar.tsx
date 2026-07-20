@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, ScrollView, Pressable, Modal } from "react-native";
 import { useTranslation } from "react-i18next";
 import { ScreenShell, PrimaryButton, TextField } from "@/components/ui/Screen";
@@ -45,6 +45,13 @@ export default function ProfessionalCalendarScreen() {
   const [startDate, setStartDate] = useState(now.toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState(now.toISOString().split("T")[0]);
   const [reason, setReason] = useState("");
+  
+  // Initialize selectedMatch if data is available
+  useEffect(() => {
+    if (data && data.length > 0 && !selectedMatch) {
+      setSelectedMatch(data[0].match_id);
+    }
+  }, [data, selectedMatch]);
   
   const markDaysOff = useMarkDaysOffRange();
 

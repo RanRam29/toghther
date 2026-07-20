@@ -179,9 +179,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         ) : null}
 
         {/* Page Content */}
-        <ScrollView className="flex-1 w-full" contentContainerClassName="items-center">
+        <View className="flex-1 w-full items-center">
           <View className="w-full max-w-6xl flex-1">{children}</View>
-        </ScrollView>
+        </View>
       </View>
 
       <AdminMfaModal

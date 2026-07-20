@@ -1,12 +1,12 @@
 [api]
-port = 54321
+port = 54355
 schemas = ["public", "graphql_public"]
 
 [db]
-port = 54322
+port = 54356
 
 [studio]
-port = 54323
+port = 54357
 
 [analytics]
 enabled = false

@@ -6,6 +6,8 @@ import { colors } from "@/lib/theme";
 export const isWeb = Platform.OS === "web";
 export const isNative = Platform.OS === "ios" || Platform.OS === "android";
 
+export const WEB_SIDEBAR_BREAKPOINT = 768;
+
 /** Whether layout animations (Reanimated entering) are reliable on this platform. */
 export const supportsLayoutAnimations = isNative;
 

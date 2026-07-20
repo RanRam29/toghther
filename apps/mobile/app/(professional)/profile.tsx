@@ -18,7 +18,7 @@ import {
 import {
   useMyProfessional,
   useUpdateMyProfessional } from "@/hooks/useProfessional";
-import { useProfessionalStats } from "@/hooks/useProfessionalTools";
+import { useProfessionalPublicStats, useMyReportingConsistency } from "@/hooks/useProfessionalTools";
 import { useAuthStore } from "@/stores/auth-store";
 import { BrandSpinner } from "@/components/motion/BrandSpinner";
 
@@ -34,7 +34,8 @@ export default function ProfessionalProfileScreen() {
   const userId = session?.user?.id;
 
   const { data: professional, isLoading } = useMyProfessional(userId);
-  const { data: stats } = useProfessionalStats(professional?.id);
+  const { data: stats } = useProfessionalPublicStats(professional?.id);
+  const { data: reportingConsistency } = useMyReportingConsistency(professional?.id);
   const update = useUpdateMyProfessional(userId);
 
   const [displayName, setDisplayName] = useState("");
@@ -120,7 +121,7 @@ export default function ProfessionalProfileScreen() {
             </View>
             <View className="w-px bg-teal/20" />
             <View className="flex-1 items-center">
-              <Text className="text-2xl font-bold text-teal font-rubik">{stats.reporting_consistency_90d}%</Text>
+              <Text className="text-2xl font-bold text-teal font-rubik">{reportingConsistency}%</Text>
               <Text className="text-xs text-teal-ink text-center mt-1">עקביות דיווח</Text>
             </View>
           </View>
