@@ -21,7 +21,7 @@ export function UsageGuide({ role, onClose, showDontShowAgain = true }: UsageGui
   const steps = useMemo(() => GUIDE_STEPS[gRole] ?? [], [gRole]);
 
   const [index, setIndex] = useState(0);
-  const [dontShowAgain, setDontShowAgain] = useState(true);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   if (steps.length === 0) return null;
 
