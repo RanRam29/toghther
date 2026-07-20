@@ -203,6 +203,14 @@ export interface ParentOnboardingInput {
   city: { lng: number; lat: number };
   diagnosisFull?: string;
   notes?: string;
+  // P-02 step 3 — required weekly support hours: { sunday: [8, 14], ... }
+  hoursNeeded?: Record<string, [number, number]> | null;
+  // P-02 step 5 — guided free-text (child_details, TIER 2)
+  whatWorks?: string;
+  whatTriggers?: string;
+  winDefinition?: string;
+  // P-02 step 6 — D6 publish decision (default false)
+  published?: boolean;
 }
 
 export async function completeParentOnboarding(
@@ -221,8 +229,9 @@ export async function completeParentOnboarding(
       framework: input.framework,
       communication_verbal: input.communicationVerbal,
       needs: input.needs,
+      hours_needed: input.hoursNeeded ?? null,
       location: toGeoPoint(input.city.lng, input.city.lat),
-      published: false,
+      published: input.published ?? false,
     })
     .select("id")
     .single();
@@ -233,6 +242,9 @@ export async function completeParentOnboarding(
     child_id: child.id,
     full_name: input.firstName.trim(),
     diagnosis_full: input.diagnosisFull?.trim() || null,
+    what_works: input.whatWorks?.trim() || null,
+    what_triggers: input.whatTriggers?.trim() || null,
+    win_definition: input.winDefinition?.trim() || null,
     notes: input.notes?.trim() || null,
   });
 

@@ -92,7 +92,9 @@ export default function ParentHomeScreen() {
     isLoading: matchesLoading,
     refetch: refetchMatches,
     isRefetching: matchesRefetching,
-    error: matchesError } = useChildMatches(selectedChild?.published ? selectedChild.id : undefined);
+    error: matchesError } = useChildMatches(selectedChild?.id);
+  // S-PAR-01: an unpublished child still sees matches — publish only affects
+  // whether verified aides can browse/find the child (S-PRO-05).
 
   const isLoading = childrenLoading || matchesLoading;
   const isRefetching = childrenRefetching || matchesRefetching;
@@ -224,12 +226,30 @@ export default function ParentHomeScreen() {
           </Pressable>
         ) : null}
 
+        {selectedChild && !selectedChild.published ? (
+          <Pressable
+            onPress={() =>
+              router.push("/(parent)/(tabs)/child-profile" as never)
+            }
+            className="rounded-card border border-amber bg-amber-bg p-4 mb-4 active:opacity-90"
+          >
+            <Text className="text-amber-ink font-bold font-rubik text-sm mb-1">
+              {t("parent.publishNudgeTitle", "הפרופיל עדיין לא פורסם")}
+            </Text>
+            <Text className="text-amber-ink font-rubik text-xs leading-5">
+              {t("parent.publishNudgeBody", {
+                name: selectedChild.first_name,
+                defaultValue:
+                  "אתם רואים כאן התאמות. פרסמו את הפרופיל כדי שמשלבות מאומתות יוכלו למצוא את {{name}} גם ביוזמתן.",
+              })}
+            </Text>
+          </Pressable>
+        ) : null}
+
         {isLoading ? (
           <BrandSpinner size="large" />
         ) : children.length === 0 ? (
           <PlaceholderCard text={t("parent.noChildProfile")} />
-        ) : !selectedChild?.published ? (
-          <PlaceholderCard text={t("parent.childNotPublished")} />
         ) : matchesError ? (
           <PlaceholderCard text={t("parent.matchesError")} />
         ) : matches.length === 0 ? (
