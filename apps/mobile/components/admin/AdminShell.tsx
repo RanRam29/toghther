@@ -19,7 +19,7 @@ export function AdminShell({ children }: AdminShellProps) {
   async function handleLogout() {
     await supabase.auth.signOut();
     reset();
-    router.replace("/(auth)/role-select");
+    router.replace("/(auth)/login");
   }
 
   return (

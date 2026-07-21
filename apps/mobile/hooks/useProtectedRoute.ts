@@ -48,7 +48,7 @@ export function useProtectedRoute() {
       isStaffUser(session, profile) || hasStaffProfileRole(profile);
 
     if (!session && !inAuthGroup) {
-      router.replace("/(auth)/role-select");
+      router.replace("/(auth)/login");
       return;
     }
 

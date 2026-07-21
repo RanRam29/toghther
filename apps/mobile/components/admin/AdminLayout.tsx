@@ -36,7 +36,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   async function handleLogout() {
     await supabase.auth.signOut();
     reset();
-    router.replace("/(auth)/role-select");
+    router.replace("/(auth)/login");
   }
 
   const current = segments[segments.length - 1] ?? "dashboard";

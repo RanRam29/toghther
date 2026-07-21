@@ -31,7 +31,7 @@ export function StaffShell({ children }: StaffShellProps) {
   async function handleLogout() {
     await supabase.auth.signOut();
     reset();
-    router.replace("/(auth)/role-select");
+    router.replace("/(auth)/login");
   }
 
   const subtitle = isAdmin
