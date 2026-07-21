@@ -21,7 +21,13 @@ function mapAuthError(error: unknown): string {
   return error.message || "auth.authFailed";
 }
 
-export async function sendPhoneOtp(phone: string, role: UserRole) {
+export async function sendPhoneOtp(
+  phone: string,
+  role: UserRole,
+  options: { shouldCreateUser?: boolean } = {}
+) {
+  const { shouldCreateUser = true } = options;
+
   if (!isSupabaseConfigured) {
     throw new Error("Supabase is not configured. Add credentials to .env");
   }
@@ -34,11 +40,17 @@ export async function sendPhoneOtp(phone: string, role: UserRole) {
   const { error } = await supabase.auth.signInWithOtp({
     phone: e164,
     options: {
+      // בזרימת התחברות חוסמים יצירת משתמש חדש — רק משתמשים קיימים
+      shouldCreateUser,
       data: { role },
     },
   });
 
   if (error) {
+    // כשחוסמים יצירה ואין משתמש כזה, Supabase מחזיר "Signups not allowed for otp"
+    if (!shouldCreateUser && error.message.toLowerCase().includes("signups not allowed")) {
+      throw new Error("auth.noAccountPhone");
+    }
     const mapped = mapAuthError(error);
     throw new Error(mapped.startsWith("auth.") ? mapped : error.message);
   }

@@ -254,6 +254,7 @@
     "supabaseMissing": "Supabase credentials missing. Add a .env file",
     "authFailed": "Sign-in failed. Please try again.",
     "otpSendFailed": "We couldn't send an SMS code right now. Please try again later.",
+    "noAccountPhone": "No account found for this number. Tap 'Sign up' to register.",
     "pro": {
       "eyebrow": "Professional profile",
       "title": "Let's build your profile",

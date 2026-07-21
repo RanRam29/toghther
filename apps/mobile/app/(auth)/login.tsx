@@ -46,7 +46,6 @@ export default function LoginScreen() {
   }
 
   async function handleEmailLogin() {
-    if (!selectedRole) return router.replace("/(auth)/role-select");
     if (!isSupabaseConfigured) return Alert.alert(t("common.error"), t("auth.supabaseMissing"));
     if (!email.includes("@")) return setError(t("auth.invalidEmail"));
     if (password.length < 6) return setError(t("auth.invalidPassword"));
@@ -60,6 +59,10 @@ export default function LoginScreen() {
         if (hasStaffProfileRole(profile)) router.replace(staffHomeHref() as never);
         else if (profile.role === "parent") router.replace("/(parent)/(tabs)");
         else if (profile.role === "professional") router.replace("/(professional)");
+        else router.replace("/(auth)/onboarding");
+      } else {
+        // משתמש קיים שטרם השלים פרטים — ממשיכים להשלמת הפרופיל
+        router.replace("/(auth)/onboarding");
       }
     } catch (err) {
       const raw = err instanceof Error ? err.message : t("auth.authFailed");
@@ -70,14 +73,17 @@ export default function LoginScreen() {
   }
 
   async function handlePhoneLogin() {
-    if (!selectedRole) return router.replace("/(auth)/role-select");
     if (!isSupabaseConfigured) return Alert.alert(t("common.error"), t("auth.supabaseMissing"));
     if (!isValidIsraeliPhone(phone)) return setError(t("auth.invalidPhone"));
 
     setError(undefined);
     setLoading(true);
     try {
-      await sendPhoneOtp(phone, selectedRole!);
+      // רק מי שהגיע מבחירת תפקיד נמצא בהרשמה ורשאי ליצור משתמש חדש;
+      // התחברות רגילה חוסמת יצירה כדי שרק משתמשים קיימים יוכלו להיכנס
+      await sendPhoneOtp(phone, selectedRole ?? "parent", {
+        shouldCreateUser: !!selectedRole,
+      });
       setPendingPhone(phone);
       router.push("/(auth)/verify-otp");
     } catch (err) {
@@ -198,27 +204,21 @@ export default function LoginScreen() {
 
               {/* Social / Alternate Logins */}
               <View className="gap-3 max-w-sm w-full mx-auto">
-                {/* eslint-disable-next-line no-restricted-syntax -- neutral/white social button; kit has no neutral variant yet */}
-                <Pressable
+                <Button
+                  variant="neutral"
+                  label={t("auth.loginGoogle", "התחברות עם גוגל")}
+                  icon={<MaterialIcons name="g-mobiledata" size={32} color="#DB4437" />}
                   onPress={handleGoogleLogin}
-                  className="w-full h-[52px] flex-row items-center justify-center gap-3 rounded-[14px] bg-white border border-border active:bg-surface-2 transition-colors"
-                >
-                  <MaterialIcons name="g-mobiledata" size={32} color="#DB4437" />
-                  <Text className="font-rubik text-base text-ink">
-                    {t("auth.loginGoogle", "התחברות עם גוגל")}
-                  </Text>
-                </Pressable>
-                
-                {/* eslint-disable-next-line no-restricted-syntax -- neutral/white toggle button; kit has no neutral variant yet */}
-                <Pressable
+                  className="w-full"
+                />
+
+                <Button
+                  variant="neutral"
+                  label={isPhoneMode ? t("auth.loginMethodEmail", "התחברות עם אימייל") : t("auth.loginMethodPhone", "התחברות עם הודעת SMS")}
+                  icon={<MaterialIcons name={isPhoneMode ? "email" : "smartphone"} size={24} color="#534AB7" />}
                   onPress={() => setIsPhoneMode(!isPhoneMode)}
-                  className="w-full h-[52px] flex-row items-center justify-center gap-3 rounded-[14px] bg-white border border-border active:bg-surface-2 transition-colors"
-                >
-                  <MaterialIcons name={isPhoneMode ? "email" : "smartphone"} size={24} color="#534AB7" />
-                  <Text className="font-rubik text-base text-ink">
-                    {isPhoneMode ? t("auth.loginMethodEmail", "התחברות עם אימייל") : t("auth.loginMethodPhone", "התחברות עם הודעת SMS")}
-                  </Text>
-                </Pressable>
+                  className="w-full"
+                />
               </View>
             </View>
 

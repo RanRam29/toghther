@@ -9,7 +9,7 @@ export default function Index() {
 
   if (!isHydrated) return null;
 
-  if (!session) return <Redirect href="/(auth)/role-select" />;
+  if (!session) return <Redirect href="/(auth)/login" />;
 
   if (!isProfileComplete(profile)) {
     return <Redirect href="/(auth)/onboarding" />;

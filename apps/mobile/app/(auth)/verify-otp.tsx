@@ -7,7 +7,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { OtpInput } from "@/components/ui/Screen";
 import { AppLogo } from "@/components/ui/AppLogo";
-import { fetchProfile, sendPhoneOtp, verifyPhoneOtp } from "@/lib/auth-api";
+import { fetchProfile, isProfileComplete, sendPhoneOtp, verifyPhoneOtp } from "@/lib/auth-api";
+import { hasStaffProfileRole, staffHomeHref } from "@/lib/staff-auth";
 import { AnalyticsEvents } from "@/lib/analytics/events";
 import { track } from "@/lib/analytics/track";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -28,10 +29,11 @@ export default function VerifyOtpScreen() {
   const lastAttempt = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!pendingPhone || !selectedRole) {
+    // דרוש רק מספר טלפון ממתין — התפקיד קיים בהרשמה בלבד, ולא בהתחברות
+    if (!pendingPhone) {
       router.replace("/(auth)/login");
     }
-  }, [pendingPhone, selectedRole, router]);
+  }, [pendingPhone, router]);
 
   // Resend cooldown countdown — S-AUTH-02 / AUTH-SPEC §2 (30s UI cooldown)
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function VerifyOtpScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [otp]);
 
-  if (!pendingPhone || !selectedRole) {
+  if (!pendingPhone) {
     return null;
   }
 
@@ -70,12 +72,18 @@ export default function VerifyOtpScreen() {
 
       void track(AnalyticsEvents.SIGNUP_COMPLETED, { role: selectedRole ?? "unknown" });
 
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setProfile(profile);
-      }
+      const profile = session?.user ? await fetchProfile(session.user.id) : null;
+      if (profile) setProfile(profile);
 
-      router.replace("/(auth)/onboarding");
+      // משתמש קיים שהשלים פרופיל — לבית שלו; אחרת (הרשמה/פרטים חסרים) — להשלמה
+      if (profile && isProfileComplete(profile)) {
+        if (hasStaffProfileRole(profile)) router.replace(staffHomeHref() as never);
+        else if (profile.role === "parent") router.replace("/(parent)/(tabs)");
+        else if (profile.role === "professional") router.replace("/(professional)");
+        else router.replace("/(auth)/onboarding");
+      } else {
+        router.replace("/(auth)/onboarding");
+      }
     } catch {
       // Spec S-AUTH-02 error copy — אחיד, בלי לחשוף אם המספר קיים (user enumeration)
       setError(t("auth.otpMismatch", "הקוד לא תואם — ננסה שוב?"));
@@ -85,12 +93,15 @@ export default function VerifyOtpScreen() {
   }
 
   async function handleResend() {
-    if (!selectedRole || cooldown > 0 || resending) return;
+    if (cooldown > 0 || resending) return;
 
     setResending(true);
     setError(undefined);
     try {
-      await sendPhoneOtp(pendingPhone, selectedRole);
+      // שולחים מחדש עם אותה כוונה: הרשמה יוצרת משתמש, התחברות חוסמת יצירה
+      await sendPhoneOtp(pendingPhone, selectedRole ?? "parent", {
+        shouldCreateUser: !!selectedRole,
+      });
       setOtp("");
       lastAttempt.current = null;
       setCooldown(30);
