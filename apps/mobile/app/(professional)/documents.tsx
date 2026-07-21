@@ -150,6 +150,7 @@ export default function ProfessionalDocumentsScreen() {
           const existing = documents.find((d) => d.doc_type === docType);
           const uploading = uploadingType === docType;
           return (
+            /* eslint-disable-next-line no-restricted-syntax -- optional-document list row (name + upload affordance), not a button */
             <Pressable
               key={docType}
               onPress={() => handleUpload(docType)}

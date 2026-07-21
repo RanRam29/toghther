@@ -78,10 +78,12 @@ export default function ProfessionalCalendarScreen() {
       backFallbackHref="/(professional)/today"
     >
       <View className="flex-row items-center justify-between bg-surface border border-border rounded-full px-4 py-2 mb-4 mt-2">
+        {/* eslint-disable-next-line no-restricted-syntax -- week stepper nav chevron, not a page CTA */}
         <Pressable onPress={prevWeek} className="px-2 py-1">
           <Text className="text-purple font-bold text-lg font-rubik">&lt;</Text>
         </Pressable>
         <Text className="text-base font-bold text-ink font-rubik text-center">{weekLabel}</Text>
+        {/* eslint-disable-next-line no-restricted-syntax -- week stepper nav chevron, not a page CTA */}
         <Pressable onPress={nextWeek} className="px-2 py-1">
           <Text className="text-purple font-bold text-lg font-rubik">&gt;</Text>
         </Pressable>
@@ -156,8 +158,9 @@ export default function ProfessionalCalendarScreen() {
             <Text className="text-sm text-ink font-bold mb-2 text-start">בחר ליווי:</Text>
             <View className="flex-row flex-wrap gap-2 mb-4">
               {data?.map(m => (
-                <Pressable 
-                  key={m.match_id} 
+                /* eslint-disable-next-line no-restricted-syntax -- match-selection chip (single-select filter), not a button */
+                <Pressable
+                  key={m.match_id}
                   onPress={() => setSelectedMatch(m.match_id)}
                   className={`px-3 py-2 border rounded-full ${selectedMatch === m.match_id ? 'bg-purple border-purple' : 'border-border'}`}
                 >

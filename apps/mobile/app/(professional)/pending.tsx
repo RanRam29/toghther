@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 
 import { DocumentChecklist } from "@/components/professional/DocumentChecklist";
 import { ScreenShell } from "@/components/ui/Screen";
+import { Button } from "@/components/ui/Button";
 import {
   buildDocumentChecklist,
   verificationProgress,
@@ -70,23 +71,18 @@ export default function PendingVerificationScreen() {
         )}
       </View>
 
-      <Pressable
+      <Button
+        label={t("professional.pendingUploadCta")}
         onPress={() => router.push("/(professional)/documents" as never)}
-        className="bg-purple rounded-full py-4 items-center mb-4 active:opacity-90"
-      >
-        <Text className="text-white font-bold font-rubik">
-          {t("professional.pendingUploadCta")}
-        </Text>
-      </Pressable>
+        className="rounded-full mb-4"
+      />
 
-      <Pressable
+      <Button
+        variant="outline-secondary"
+        label={t("professional.pendingProfileCta")}
         onPress={() => router.push("/(professional)/profile" as never)}
-        className="rounded-full border border-teal py-4 items-center active:opacity-90"
-      >
-        <Text className="text-teal font-bold font-rubik">
-          {t("professional.pendingProfileCta")}
-        </Text>
-      </Pressable>
+        className="rounded-full"
+      />
     </ScreenShell>
   );
 }

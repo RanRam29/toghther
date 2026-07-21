@@ -58,10 +58,12 @@ export default function AttendanceScreen() {
       backFallbackHref="/(professional)/today"
     >
       <View className="flex-row items-center justify-between bg-surface border border-border rounded-full px-4 py-2 mb-6 mt-2">
+        {/* eslint-disable-next-line no-restricted-syntax -- month stepper nav chevron, not a page CTA */}
         <Pressable onPress={prevMonth} className="px-2 py-1">
           <Text className="text-purple font-bold text-lg font-rubik">&lt;</Text>
         </Pressable>
         <Text className="text-base font-bold text-ink font-rubik">{monthLabel}</Text>
+        {/* eslint-disable-next-line no-restricted-syntax -- month stepper nav chevron, not a page CTA */}
         <Pressable onPress={nextMonth} className="px-2 py-1">
           <Text className="text-purple font-bold text-lg font-rubik">&gt;</Text>
         </Pressable>

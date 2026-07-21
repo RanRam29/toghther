@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
-  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -13,6 +12,7 @@ import { DailyLogRow } from "@/components/active-match/InsightsCard";
 import { EmptyState } from "@/components/motion/EmptyState";
 import { NextActionCard } from "@/components/shared/NextActionCard";
 import { ScreenShell } from "@/components/ui/Screen";
+import { Button } from "@/components/ui/Button";
 import { useActiveMatchForProfessional } from "@/hooks/useActiveMatch";
 import { useCheckin } from "@/hooks/useCheckin";
 import { useMatchCheckins, useTodayCheckin } from "@/hooks/useCheckins";
@@ -161,35 +161,31 @@ export default function ProfessionalTodayScreen() {
         ) : null}
 
         <View className="mb-4">
-          <Pressable
+          <Button
+            variant="outline-secondary"
+            label={t("professional.viewChildDetails", "צפייה בתיק הילד")}
             onPress={() =>
               router.push({
                 pathname: "/(professional)/child-details" as any,
                 params: { childId: activeMatch.child?.id } })
             }
-            className="bg-surface border border-teal rounded-full py-3 items-center active:opacity-90 mb-2"
-          >
-            <Text className="text-teal font-bold text-base font-rubik">
-              {t("professional.viewChildDetails", "צפייה בתיק הילד")}
-            </Text>
-          </Pressable>
+            className="rounded-full mb-2"
+          />
           <View className="flex-row gap-2">
-            <Pressable
+            <Button
+              variant="outline"
+              size="sm"
+              label="יומן שבועי"
               onPress={() => router.push("/(professional)/calendar" as any)}
-              className="flex-1 bg-surface border border-purple rounded-full py-3 items-center active:opacity-90"
-            >
-              <Text className="text-purple font-bold text-sm font-rubik">
-                יומן שבועי
-              </Text>
-            </Pressable>
-            <Pressable
+              className="flex-1 rounded-full"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              label="דוח שעות"
               onPress={() => router.push("/(professional)/attendance" as any)}
-              className="flex-1 bg-surface border border-purple rounded-full py-3 items-center active:opacity-90"
-            >
-              <Text className="text-purple font-bold text-sm font-rubik">
-                דוח שעות
-              </Text>
-            </Pressable>
+              className="flex-1 rounded-full"
+            />
           </View>
         </View>
 
@@ -239,20 +235,19 @@ export default function ProfessionalTodayScreen() {
                 ? t("professional.todayQuestionnaireDone", { count: todayLogs.length })
                 : t("professional.todayQuestionnaireDesc", { name: childName })}
             </Text>
-            <Pressable
+            <Button
+              label={
+                todayLogs.length > 0
+                  ? t("professional.todayQuestionnaireAddMore")
+                  : t("professional.todayQuestionnaireCta")
+              }
               onPress={() =>
                 router.push({
                   pathname: "/(active-match)/daily-log-form",
                   params: { matchId } })
               }
-              className="bg-purple rounded-full py-4 items-center active:opacity-90"
-            >
-              <Text className="text-white font-bold text-base font-rubik">
-                {todayLogs.length > 0
-                  ? t("professional.todayQuestionnaireAddMore")
-                  : t("professional.todayQuestionnaireCta")}
-              </Text>
-            </Pressable>
+              className="rounded-full"
+            />
           </View>
         ) : null}
 
@@ -323,18 +318,16 @@ export default function ProfessionalTodayScreen() {
           </>
         ) : null}
 
-        <Pressable
+        <Button
+          variant="outline-secondary"
+          label={t("activeMatch.bannerAction")}
           onPress={() =>
             router.push({
               pathname: "/(active-match)",
               params: { matchId } })
           }
-          className="mt-4 mb-8 rounded-card border border-teal py-4 items-center active:opacity-90"
-        >
-          <Text className="text-teal font-semibold text-base font-rubik">
-            {t("activeMatch.bannerAction")}
-          </Text>
-        </Pressable>
+          className="mt-4 mb-8"
+        />
       </ScrollView>
     </ScreenShell>
   );
